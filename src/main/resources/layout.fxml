@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ToggleGroup?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.stage.FileChooser?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="Controller"
+            prefHeight="800.0" prefWidth="1100.0">
+    <GridPane fx:id="mainLayout" gridLinesVisible="false" hgap="50" minHeight="800" minWidth="1100" prefHeight="-Infinity" prefWidth="-Infinity" maxHeight="-Infinity" maxWidth="-Infinity">
+        <columnConstraints>
+            <ColumnConstraints fx:id="" percentWidth="20" hgrow="ALWAYS"></ColumnConstraints>
+            <ColumnConstraints percentWidth="80" hgrow="ALWAYS"></ColumnConstraints>
+        </columnConstraints>
+
+        <rowConstraints>
+            <RowConstraints percentHeight="100" vgrow="ALWAYS"></RowConstraints>
+        </rowConstraints>
+
+        <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+
+        <Pane fx:id="root" maxWidth="700" maxHeight="700" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1"></Pane>
+
+        <VBox spacing="10" alignment="TOP_CENTER">
+            <GridPane fx:id="gPParams" maxWidth="300" maxHeight="120" gridLinesVisible="false">
+                <!--.errorLabel {-->
+                 <!-- -fx-font: 10px "Times";-->
+                 <!-- -fx-padding: 10;-->
+                 <!-- -fx-text-fill: red-->
+                <!--}-->
+
+                <!--.label {-->
+                 <!-- -fx-font: 14px "Times"-->
+                 <!-- -fx-padding: 10;-->
+                 <!-- -fx-text-fill: black-->
+                <!--}-->
+
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"></ColumnConstraints>
+                    <ColumnConstraints percentWidth="50"></ColumnConstraints>
+                </columnConstraints>
+
+                <rowConstraints>
+                </rowConstraints>
+
+
+
+                <Label fx:id="labelTime" text="Time" styleClass="" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP" ></Label>
+                <TextField fx:id="txtTime" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></TextField>
+                <Label fx:id="labelInvalidTime" text="Invalid value" textFill="red"  visible="false" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+
+                <Label fx:id="labelStep" text="Step" styleClass="" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+                <TextField fx:id="txtStep" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></TextField>
+                <Label fx:id="labelInvalidStep" text="Invalid value" textFill="red" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+
+                <Label fx:id="labelR0" text="R0" styleClass=""  GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+                <TextField fx:id="txtR0" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></TextField>
+                <Label fx:id="labelInvalidR0" text="Invalid value" textFill="red" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="5" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+
+                <Label fx:id="labelEps" text="Eps" styleClass="label"  GridPane.columnIndex="0" GridPane.rowIndex="6" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+                <TextField fx:id="txtEps" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></TextField>
+                <Label fx:id="labelInvalidEps" text="Invalid value" textFill="red" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="7" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+
+                <Label fx:id="labelMass" text="Mass" styleClass="label"  GridPane.columnIndex="0" GridPane.rowIndex="8" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+                <TextField fx:id="txtMass" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="8" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></TextField>
+                <Label fx:id="labelInvalidMass" text="Invalid value" textFill="red" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="9" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+
+
+                <Label fx:id="labelBoxSize" text="Box size" styleClass="label"  GridPane.columnIndex="0" GridPane.rowIndex="10" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+                <TextField fx:id="txtBoxSize" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="10" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></TextField>
+                <Label fx:id="labelInvalidBoxSize" text="Invalid value" textFill="red" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="11" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+
+
+                <Label fx:id="labelWallStiffness" text="Wall stiffness" styleClass="label"  GridPane.columnIndex="0" GridPane.rowIndex="12" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+                <TextField fx:id="txtWallStiffness" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="12" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></TextField>
+                <Label fx:id="labelInvalidWallStiffness" text="Invalid value" textFill="red" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="13" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" GridPane.valignment="TOP"></Label>
+
+            </GridPane>
+            <GridPane fx:id="gpMolecules" hgap="5" gridLinesVisible="false" maxWidth="300">
+                <Label fx:id="labelMoledules" text="Molecules" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.rowSpan="1"></Label>
+
+                <Slider fx:id="sliderMolecules" majorTickUnit="1" blockIncrement="1" min="1" max="1000" minorTickCount="0" snapToTicks="true" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2" GridPane.rowSpan="1"></Slider>
+
+                <TextField fx:id="txtMolecules" onAction="#txtMoleculesAction" maxWidth="50" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="RIGHT"></TextField>
+                <Label fx:id="labelInvalidMolecules" text="Invalid value" textFill="red" visible="false" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="RIGHT"></Label>
+
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="65"></ColumnConstraints>
+                    <ColumnConstraints percentWidth="35"></ColumnConstraints>
+                </columnConstraints>
+
+            </GridPane>
+            <Button fx:id="btnOk" onAction="#btnOkAction" maxWidth="50" text="Calc"></Button>
+                <!--<Button fx:id="btnOk" onAction="btnOkAction"></Button>-->
+
+            <GridPane fx:id="gpTogBtnGrid" gridLinesVisible="false" maxWidth="300" hgap="8">
+
+
+                    <Button fx:id="tbtnPlay" disable="true" minWidth="55" text="Play" onAction="#tbtnPlayAction"  GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" ></Button>
+                    <Button fx:id="tbtnPause" disable="true" minWidth="75" text="Pause" onAction="#tbtnPauseAction" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1"></Button>
+                    <Button fx:id="tbtnStop" disable="true" minWidth="55" text="Stop" onAction="#tbtnStopActon" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1"></Button>
+
+            </GridPane>
+
+            <GridPane fx:id="gpTogACh" gridLinesVisible="false" maxWidth="300" hgap="10">
+
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="57.5"></ColumnConstraints>
+                        <ColumnConstraints percentWidth="42.5"></ColumnConstraints>
+                    </columnConstraints>
+
+
+
+                    <Button fx:id="tbtnAnim" text="Animation" disable="true" onAction="#tbtnAnimAction" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER" ></Button>
+                    <Button fx:id="tbtnChart" text="Chart" disable="true" onAction="#tbtnChartAction" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="1" GridPane.rowSpan="1" GridPane.halignment="CENTER"></Button>
+
+                </GridPane>
+
+            <Label text="Load"></Label>
+            <Button fx:id="btnLoad" prefWidth="100" onAction="#btnLoadAction" text="Load"></Button>
+
+            <fx:define>
+                <FileChooser fx:id="chooser"/>
+            </fx:define>
+
+            <Label text="Save"></Label>
+            <Button fx:id="btnSave" prefWidth="100" onAction="#btnSaveAction" text="Save"></Button>
+
+        </VBox>
+
+
+    </GridPane>
+
+
+
+</AnchorPane>
