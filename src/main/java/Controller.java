@@ -1,4 +1,5 @@
 import javafx.animation.PathTransition;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
@@ -125,12 +126,7 @@ public class Controller {
         sliderMolecules.valueProperty()
                        .addListener(l -> txtMolecules.setText(String.valueOf(sliderMolecules.getValue())));
 
-        eKin = new XYChart.Series<>();
-        ePot = new XYChart.Series<>();
-        eElat = new XYChart.Series<>();
-        eTotal = new XYChart.Series<>();
-
-
+        initCharts();
     }
 
     @FXML
@@ -245,10 +241,7 @@ public class Controller {
 
 
         }
-        eKin.setName("Kinetic E");
-        ePot.setName("Potential E");
-        eElat.setName("Elastic E");
-        eTotal.setName("Total E");
+//        setChartNames();
         ptr = new ArrayList<>();
         atoms = new ArrayList<>();
         double rScaled = molec.getR() / molec.getBoxSize() * root.getWidth();
@@ -283,8 +276,6 @@ public class Controller {
         calculationStatusLabel.setText("Calculation done");
         tbtnAnim.setDisable(false);
         tbtnChart.setDisable(false);
-
-
     }
 
 
@@ -310,7 +301,7 @@ public class Controller {
         tbtnPlay.setDisable(true);
         tbtnStop.setDisable(true);
 
-        tbtnPlay.setDisable(true);
+        tbtnChart.setDisable(true);
         tbtnAnim.setDisable(true);
 
 
@@ -357,16 +348,7 @@ public class Controller {
         figure.setLegendVisible(true);
         figure.setMinSize(root.getWidth(), root.getHeight());
 
-
-        eKin = new XYChart.Series<>();
-        ePot = new XYChart.Series<>();
-        eElat = new XYChart.Series<>();
-        eTotal = new XYChart.Series<>();
-
-        eKin.setName("Kinetic E");
-        ePot.setName("Potential E");
-        eElat.setName("Elastic E");
-        eTotal.setName("Total E");
+        initCharts();
 
 
         final double threadBoxSize = boxSize;
@@ -376,12 +358,10 @@ public class Controller {
             .add(calculationStatusLabel);
         calculationStatusLabel.setText("Calculation in progress");
 
-
-        new Thread() {
+        new Task<Void> () {
             @Override
-            public synchronized void start() {
+            public Void call() {
                 double currentTime = 0;
-                super.start();
                 for (int i = 0; i < n; i++) {
 
                     molec.addRow(i, currentTime, md.getrAtoms(), md.getvAtoms(), md.getaAtoms(), md.getKinE(), md.getPotE(), md.getElastE());
@@ -443,9 +423,9 @@ public class Controller {
                 calculationStatusLabel.setText("Calculation done");
                 tbtnAnim.setDisable(false);
                 tbtnChart.setDisable(false);
-
+                return null;
             }
-        }.start();
+        }.call();
     }
 
     @FXML
@@ -475,6 +455,25 @@ public class Controller {
             errorLabel.setVisible(true);
         }
         return value;
+    }
+
+    private void initCharts() {
+        resetChartData();
+        setChartNames();
+    }
+
+    private void resetChartData() {
+        eKin = new XYChart.Series<>();
+        ePot = new XYChart.Series<>();
+        eElat = new XYChart.Series<>();
+        eTotal = new XYChart.Series<>();
+    }
+
+    private void setChartNames() {
+        eKin.setName("Kinetic E");
+        ePot.setName("Potential E");
+        eElat.setName("Elastic E");
+        eTotal.setName("Total E");
     }
 }
 
