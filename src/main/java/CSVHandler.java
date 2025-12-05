@@ -6,7 +6,16 @@ public class CSVHandler {
 
         PrintWriter pw = new PrintWriter(path);
         StringBuilder sb = new StringBuilder();
-        sb.append(molecules.getMoleculesQuantity() + "," + molecules.getN() + "," + molecules.getR() + ","  + molecules.getEps() + "," + molecules.getBoxSize() + "\n");
+        sb.append(molecules.getMoleculesQuantity())
+          .append(",")
+          .append(molecules.getN())
+          .append(",")
+          .append(molecules.getR())
+          .append(",")
+          .append(molecules.getEps())
+          .append(",")
+          .append(molecules.getBoxSize())
+          .append("\n");
 
         int n = molecules.getN();
         int quantity = molecules.getMoleculesQuantity();
@@ -15,23 +24,66 @@ public class CSVHandler {
 
         for(int i=0; i<quantity; i++) {
             if(i==(quantity-1)) {
-                sb.append("Mol" + i + "-rx,Mol" + i + "-ry,Mol" + i + "-vx,Mol" + i + "-vy,Mol" + i + "-ax,Mol" + i + "-ay\n");
+                sb.append("Mol")
+                  .append(i)
+                  .append("-rx,Mol")
+                  .append(i)
+                  .append("-ry,Mol")
+                  .append(i)
+                  .append("-vx,Mol")
+                  .append(i)
+                  .append("-vy,Mol")
+                  .append(i)
+                  .append("-ax,Mol")
+                  .append(i)
+                  .append("-ay\n");
             } else {
-                sb.append("Mol" + i + "-rx,Mol" + i + "-ry,Mol" + i + "-vx,Mol" + i + "-vy,Mol" + i + "-ax,Mol" + i + "-ay,");
+                sb.append("Mol")
+                  .append(i)
+                  .append("-rx,Mol")
+                  .append(i)
+                  .append("-ry,Mol")
+                  .append(i)
+                  .append("-vx,Mol")
+                  .append(i)
+                  .append("-vy,Mol")
+                  .append(i)
+                  .append("-ax,Mol")
+                  .append(i)
+                  .append("-ay,");
             }
         }
 
         for(int i=0; i<n; i++) {
 
-            sb.append(molecules.getTime()[i] + "," + molecules.getEkin()[i] + "," + molecules.getEpot()[i] + "," + molecules.getElastE()[i] + ",");
+            sb.append(molecules.getTime()[i])
+              .append(",")
+              .append(molecules.getEkin()[i])
+              .append(",")
+              .append(molecules.getEpot()[i])
+              .append(",")
+              .append(molecules.getElastE()[i])
+              .append(",");
 
             for(int j=0; j<quantity; j++) {
-                sb.append(molecules.getrVectors()[j][i][0] + "," + molecules.getrVectors()[j][i][1] + ",");
-                sb.append(molecules.getvVectors()[j][i][0] + "," + molecules.getvVectors()[j][i][1] + ",");
+                sb.append(molecules.getrVectors()[j][i][0])
+                  .append(",")
+                  .append(molecules.getrVectors()[j][i][1])
+                  .append(",");
+                sb.append(molecules.getvVectors()[j][i][0])
+                  .append(",")
+                  .append(molecules.getvVectors()[j][i][1])
+                  .append(",");
                 if(j==(quantity-1)) {
-                    sb.append(molecules.getaVectors()[j][i][0] + "," + molecules.getaVectors()[j][i][1] + "\n");
+                    sb.append(molecules.getaVectors()[j][i][0])
+                      .append(",")
+                      .append(molecules.getaVectors()[j][i][1])
+                      .append("\n");
                 } else {
-                    sb.append(molecules.getaVectors()[j][i][0] + "," + molecules.getaVectors()[j][i][1] + ",");
+                    sb.append(molecules.getaVectors()[j][i][0])
+                      .append(",")
+                      .append(molecules.getaVectors()[j][i][1])
+                      .append(",");
                 }
             }
         }
