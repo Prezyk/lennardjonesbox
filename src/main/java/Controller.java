@@ -201,11 +201,7 @@ public class Controller {
         molec = csv.load(file.getAbsolutePath());
         pathList = new ArrayList<>();
         ptr = new ArrayList<>();
-        x = new NumberAxis();
-        y = new NumberAxis();
-        figure = new ScatterChart<>(x, y);
-        figure.setLegendVisible(true);
-        figure.setMinSize(root.getWidth(), root.getHeight());
+        initCharts();
 
 
         for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
@@ -252,18 +248,7 @@ public class Controller {
         }
 
 
-        if (!figure.getData()
-                   .isEmpty())
-            figure.getData()
-                  .clear();
-        figure.getData()
-              .add(eKin);
-        figure.getData()
-              .add(ePot);
-        figure.getData()
-              .add(eElat);
-        figure.getData()
-              .add(eTotal);
+        reloadChartData();
         for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
             ptr.add(new PathTransition());
             ptr.get(i)
@@ -305,23 +290,23 @@ public class Controller {
         tbtnAnim.setDisable(true);
 
 
-        double time = getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> Boolean.valueOf(timeToValidate <= 0));
+        double time = getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> timeToValidate <= 0);
 
-        double step = getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> Boolean.valueOf(stepToValidate <= 0 || stepToValidate > 0.05));
+        double step = getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> stepToValidate <= 0 || stepToValidate > 0.05);
 
         double r0 = getValidValue(txtR0, labelInvalidR0);
 
         double eps = getValidValue(txtEps, labelInvalidEps);
 
-        double mass = getValidValue(txtMass, labelInvalidMass, massToValidate -> Boolean.valueOf(massToValidate <= 0));
+        double mass = getValidValue(txtMass, labelInvalidMass, massToValidate -> massToValidate <= 0);
 
-        double moleculesReaded = getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> Boolean.valueOf(moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0));
+        double moleculesReaded = getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0);
 
         int molecules = (int) moleculesReaded;
 
-        double boxSize = getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> Boolean.valueOf(massToValidate <= 0));
+        double boxSize = getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate <= 0);
 
-        double wallStiffness = getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> Boolean.valueOf(wallStiffnessToValidate <= 0));
+        double wallStiffness = getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0);
 
 
         atoms = new ArrayList<>();
@@ -340,16 +325,7 @@ public class Controller {
 
         molec = new Molecules(molecules, n, r0, eps, boxSize);
 
-        x = new NumberAxis();
-        y = new NumberAxis();
-
-        figure = new ScatterChart<>(x, y);
-
-        figure.setLegendVisible(true);
-        figure.setMinSize(root.getWidth(), root.getHeight());
-
         initCharts();
-
 
         final double threadBoxSize = boxSize;
         final double threadStep = step;
@@ -399,18 +375,7 @@ public class Controller {
                 }
                 ptr = new ArrayList<>();
 
-                if (!figure.getData()
-                           .isEmpty())
-                    figure.getData()
-                          .clear();
-                figure.getData()
-                      .add(eKin);
-                figure.getData()
-                      .add(ePot);
-                figure.getData()
-                      .add(eElat);
-                figure.getData()
-                      .add(eTotal);
+                reloadChartData();
                 for (int i = 0; i < molecules; i++) {
                     ptr.add(new PathTransition());
                     ptr.get(ptr.size() - 1)
@@ -444,10 +409,10 @@ public class Controller {
     }
 
     private Double getValidValue(TextField valueField, Label errorLabel, Function<Double, Boolean> invalidityChecker) {
-        Double value = Double.valueOf(-1.);
+        double value = -1.;
         try {
             errorLabel.setVisible(false);
-            value = Double.valueOf(valueField.getText());
+            value = Double.parseDouble(valueField.getText());
             if (invalidityChecker.apply(value))
                 throw new IllegalArgumentException();
 
@@ -458,8 +423,17 @@ public class Controller {
     }
 
     private void initCharts() {
+        initChartsStructure();
         resetChartData();
         setChartNames();
+    }
+
+    private void initChartsStructure() {
+        x = new NumberAxis();
+        y = new NumberAxis();
+        figure = new ScatterChart<>(x, y);
+        figure.setLegendVisible(true);
+        figure.setMinSize(root.getWidth(), root.getHeight());
     }
 
     private void resetChartData() {
@@ -474,6 +448,15 @@ public class Controller {
         ePot.setName("Potential E");
         eElat.setName("Elastic E");
         eTotal.setName("Total E");
+    }
+
+    private void reloadChartData() {
+        if (!figure.getData().isEmpty())
+            figure.getData().clear();
+        figure.getData().add(eKin);
+        figure.getData().add(ePot);
+        figure.getData().add(eElat);
+        figure.getData().add(eTotal);
     }
 }
 
