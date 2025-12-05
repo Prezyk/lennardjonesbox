@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class Controller {
 
@@ -313,105 +314,23 @@ public class Controller {
         tbtnAnim.setDisable(true);
 
 
-        double time;
-        try {
-            labelInvalidTime.setVisible(false);
-            time = Double.parseDouble(txtTime.getText());
-            if (time <= 0)
-                throw new NumberFormatException();
+        double time = getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> Boolean.valueOf(timeToValidate <= 0));
 
-        } catch (NumberFormatException n) {
-            labelInvalidTime.setVisible(true);
-            return;
-        }
+        double step = getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> Boolean.valueOf(stepToValidate <= 0 || stepToValidate > 0.05));
 
-        double step;
-        try {
-            labelInvalidStep.setVisible(false);
-            step = Double.parseDouble(txtStep.getText());
-            if (step <= 0 || step > 0.05)
-                throw new NumberFormatException();
+        double r0 = getValidValue(txtR0, labelInvalidR0);
 
-        } catch (NumberFormatException n) {
-            labelInvalidStep.setVisible(true);
-            return;
-        }
+        double eps = getValidValue(txtEps, labelInvalidEps);
 
+        double mass = getValidValue(txtMass, labelInvalidMass, massToValidate -> Boolean.valueOf(massToValidate <= 0));
 
-        double r0;
-        try {
-            labelInvalidR0.setVisible(false);
-            r0 = Double.parseDouble(txtR0.getText());
-        } catch (NumberFormatException n) {
-            labelInvalidR0.setVisible(true);
-            return;
-        }
-
-
-        double eps;
-        try {
-            labelInvalidEps.setVisible(false);
-
-            eps = Double.parseDouble(txtEps.getText());
-        } catch (NumberFormatException n) {
-            labelInvalidEps.setVisible(true);
-            return;
-        }
-
-
-        double mass;
-        try {
-            labelInvalidMass.setVisible(false);
-
-            mass = Double.parseDouble(txtMass.getText());
-            if (mass <= 0) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException n) {
-            labelInvalidMass.setVisible(true);
-            return;
-        }
-
-
-        double moleculesReaded;
-        try {
-            labelInvalidMolecules.setVisible(false);
-
-            moleculesReaded = Double.parseDouble(txtMolecules.getText());
-            if (moleculesReaded <= 0 || (moleculesReaded - (int) moleculesReaded) > 0)
-                throw new NumberFormatException();
-        } catch (NumberFormatException n) {
-            labelInvalidMolecules.setVisible(true);
-            return;
-        }
+        double moleculesReaded = getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> Boolean.valueOf(moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0));
 
         int molecules = (int) moleculesReaded;
 
-        double boxSize;
-        try {
-            labelInvalidMass.setVisible(false);
+        double boxSize = getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> Boolean.valueOf(massToValidate <= 0));
 
-            boxSize = Double.parseDouble(txtBoxSize.getText());
-            if (boxSize <= 0) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException n) {
-            labelInvalidMass.setVisible(true);
-            return;
-        }
-
-        double wallStiffness;
-        try {
-            labelInvalidWallStiffness.setVisible(false);
-
-            wallStiffness = Double.parseDouble(txtWallStiffness.getText());
-            if (wallStiffness <= 0) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException n) {
-            labelInvalidMass.setVisible(true);
-            return;
-        }
+        double wallStiffness = getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> Boolean.valueOf(wallStiffnessToValidate <= 0));
 
 
         atoms = new ArrayList<>();
@@ -425,7 +344,6 @@ public class Controller {
         }
 
         md = new MD(molecules, r0, eps, mass, time, boxSize, wallStiffness);
-
 
         int n = (int) Math.floor(time / step);
 
@@ -539,6 +457,24 @@ public class Controller {
             labelInvalidMolecules.setVisible(true);
         }
 
+    }
+
+    private Double getValidValue(TextField valueField, Label errorLabel) {
+        return getValidValue(valueField, errorLabel, dummy -> Boolean.FALSE);
+    }
+
+    private Double getValidValue(TextField valueField, Label errorLabel, Function<Double, Boolean> invalidityChecker) {
+        Double value = Double.valueOf(-1.);
+        try {
+            errorLabel.setVisible(false);
+            value = Double.valueOf(valueField.getText());
+            if (invalidityChecker.apply(value))
+                throw new IllegalArgumentException();
+
+        } catch (IllegalArgumentException e) {
+            errorLabel.setVisible(true);
+        }
+        return value;
     }
 }
 
