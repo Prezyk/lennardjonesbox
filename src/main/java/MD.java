@@ -48,10 +48,6 @@ public class MD {
                     this.getrAtoms()[i] = new double[]{Math.abs(gen.nextDouble()* this.getBoxSize() - this.getR0()), Math.abs(gen.nextDouble()* this.getBoxSize() - this.getR0())};
                     j = 0;
                 }
-                else {
-
-                    continue;
-                }
             }
 
             getvAtoms()[i] = new double[]{gen.nextGaussian()*10, gen.nextGaussian()*10};
@@ -64,7 +60,6 @@ public class MD {
         this.getvAtoms()[0] = new double[]{100, 0};
         this.getvAtoms()[1] = new double[]{-100, 0};
     }
-
 
     public void calculateAcc() {
 
@@ -132,8 +127,6 @@ public class MD {
                 setElastE(getElastE() + 0.5*wallStiffness*d*d*mass);
             }
         }
-
-
     }
 
 
@@ -165,23 +158,6 @@ public class MD {
     public void setaAtom(int i, double[] acc) {
         this.aAtoms[i] = acc;
     }
-
-    public double[] getvAtom(int i) {
-        return vAtoms[i];
-    }
-
-    public double[] getaAtom(int i) {
-        return aAtoms[i];
-    }
-
-    public void setrAtom(int i, double[] d) {
-        this.rAtoms[i] = d;
-    }
-
-    public double[] getrAtom(int i) {
-        return rAtoms[i];
-    }
-
 
     public int getnAtoms() {
         return nAtoms;
@@ -277,10 +253,6 @@ public class MD {
 
     public void setBoxSize(double boxSize) {
         this.boxSize = boxSize;
-    }
-
-    public double getWallStiffness() {
-        return wallStiffness;
     }
 
     public void setWallStiffness(double wallStiffness) {

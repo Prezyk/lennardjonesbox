@@ -4,7 +4,7 @@ public class CSVHandler {
 
     public void save(Molecules molecules, String path) throws FileNotFoundException {
 
-        PrintWriter pw = new PrintWriter(new File(path));
+        PrintWriter pw = new PrintWriter(path);
         StringBuilder sb = new StringBuilder();
         sb.append(molecules.getMoleculesQuantity() + "," + molecules.getN() + "," + molecules.getR() + ","  + molecules.getEps() + "," + molecules.getBoxSize() + "\n");
 
@@ -21,10 +21,6 @@ public class CSVHandler {
             }
         }
 
-
-//        System.out.println(sb.toString());
-//        sb.append(molecules.toString());
-
         for(int i=0; i<n; i++) {
 
             sb.append(molecules.getTime()[i] + "," + molecules.getEkin()[i] + "," + molecules.getEpot()[i] + "," + molecules.getElastE()[i] + ",");
@@ -37,14 +33,12 @@ public class CSVHandler {
                 } else {
                     sb.append(molecules.getaVectors()[j][i][0] + "," + molecules.getaVectors()[j][i][1] + ",");
                 }
-//                System.out.println(i);
             }
         }
 
         pw.write(sb.toString());
         pw.flush();
         pw.close();
-
     }
 
     public Molecules load(String path) throws IOException {
@@ -72,8 +66,6 @@ public class CSVHandler {
             double ElastE = Double.parseDouble(splitLine[3]);
             int jIndex;
             for(int j = 0; j<quantity; j++) {
-//                if(j==0)
-//                    System.out.println(Double.parseDouble(splitLine[j+1]) + "\t:\t" +  Double.parseDouble(splitLine[j+2]));
                 if(j==0) {
                     jIndex = j + 4;
                 } else {
@@ -90,7 +82,4 @@ public class CSVHandler {
 
         return molecules;
     }
-
-
-
 }

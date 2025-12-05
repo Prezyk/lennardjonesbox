@@ -12,7 +12,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -216,10 +215,6 @@ public class Controller {
         for (int i = 0; i < molec.getN(); i++) {
             for (int a = 0; a < molec.getMoleculesQuantity(); a++) {
 
-//                System.out.println(molec.getrVectors()[0][1][0]);
-
-
-
                 double xCoord = molec.getrVectors()[a][i][0]*root.getWidth()/molec.getBoxSize();
                 double yCoord = root.getWidth() - molec.getrVectors()[a][i][1]*root.getWidth()/molec.getBoxSize();
 
@@ -228,8 +223,6 @@ public class Controller {
                 } else {
                     pathList.get(a).getElements().add(new LineTo(xCoord, yCoord));
                 }
-
-//                    System.out.println(md.getPotE() + "\t:\t" + md.getKinE() + "\t:\t" + md.getPotE()+md.getKinE());
 
             }
 
@@ -274,11 +267,7 @@ public class Controller {
     }
 
 
-
-
-
-
-@FXML
+    @FXML
     public void btnSaveAction() throws FileNotFoundException {
 
 
@@ -288,7 +277,7 @@ public class Controller {
 
 }
 
-@FXML
+    @FXML
     public void btnOkAction() {
 
     if(!root.getChildren().isEmpty())
@@ -419,10 +408,6 @@ public class Controller {
 
 
     int n = (int)Math.floor(time/step);
-    double[][] rAtoms;
-    double[] aAtoms = new double[n];
-    double[] vAtoms = new double[n];
-    double[] E = new double[n];
 
     molec = new Molecules(molecules, n, r0, eps, boxSize);
 
@@ -464,8 +449,6 @@ public class Controller {
                 molec.addRow(i, currentTime, md.getrAtoms(), md.getvAtoms(), md.getaAtoms(), md.getKinE(), md.getPotE(), md.getElastE());
                 double[][] rAtoms = md.getrAtoms();
 
-                double[][] scaledRAtoms = rAtoms;
-
                 for(int a=0; a<molecules; a++) {
 
                     double xCoord = rAtoms[a][0]*root.getWidth()/threadBoxSize;
@@ -475,9 +458,6 @@ public class Controller {
                     } else {
                         pathList.get(a).getElements().add(new LineTo(xCoord, yCoord));
                     }
-
-//                    System.out.println(md.getPotE() + "\t:\t" + md.getKinE() + "\t:\t" + md.getPotE()+md.getKinE());
-
                 }
 
                 eKin.getData().add(new XYChart.Data(currentTime, md.getKinE()));
@@ -510,13 +490,10 @@ public class Controller {
             tbtnChart.setDisable(false);
 
         }
-
     }.start();
-
-
 }
 
-@FXML
+    @FXML
     public void txtMoleculesAction() {
         try {
             labelInvalidMolecules.setVisible(false);
@@ -525,8 +502,7 @@ public class Controller {
             labelInvalidMolecules.setVisible(true);
         }
 
-}
-
+    }
 }
 
 

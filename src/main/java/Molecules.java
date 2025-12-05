@@ -51,29 +51,6 @@ public class Molecules {
         }
     }
 
-
-//    public String toString() {
-//        StringBuilder sb = new StringBuilder();
-//        for(int i=0; i<n; i++) {
-//            sb.append(this.time[i] + "," + this.getEkin()[i] + "," + this.getEpot()[i] + "," + this.ElastE + ",");
-//            String end;
-//            for(int j=0; j<moleculesQuantity; j++) {
-//                if(j==(moleculesQuantity-1)) {
-//                    end = "\n";
-//                } else {
-//                    end = ",";
-//                }
-//                sb.append(rVectors[j][i][0] + "," + rVectors[j][i][1] + ",");
-//                sb.append(vVectors[j][i][0] + "," + vVectors[j][i][1] + ",");
-//                sb.append(aVectors[j][i][0] + "," + aVectors[j][i][1] + end);
-//            }
-//        }
-//        return sb.toString();
-//    }
-
-
-
-
     public int getMoleculesQuantity() {
         return moleculesQuantity;
     }
