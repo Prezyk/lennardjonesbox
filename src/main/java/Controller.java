@@ -116,16 +116,13 @@ public class Controller {
     ArrayList<Circle> atoms;
     boolean stop = true;
 
-
     @FXML
     FileChooser chooser;
     Molecules molec;
 
-
     public void initialize() {
         sliderMolecules.valueProperty()
                        .addListener(l -> txtMolecules.setText(String.valueOf(sliderMolecules.getValue())));
-
         initCharts();
     }
 
@@ -149,7 +146,6 @@ public class Controller {
         for (PathTransition P : ptr) {
             P.pause();
         }
-
     }
 
     @FXML
@@ -158,30 +154,23 @@ public class Controller {
             P.stop();
         }
         stop = true;
-
     }
 
     @FXML
     public void tbtnAnimAction() {
-        root.getChildren()
-            .clear();
+        root.getChildren().clear();
         for (Circle C : atoms) {
-            root.getChildren()
-                .add(C);
+            root.getChildren().add(C);
         }
         tbtnPlay.setDisable(false);
         tbtnPause.setDisable(false);
         tbtnStop.setDisable(false);
     }
 
-
     @FXML
     public void tbtnChartAction() {
-        root.getChildren()
-            .clear();
-        root.getChildren()
-            .add(figure);
-
+        root.getChildren().clear();
+        root.getChildren().add(figure);
 
         tbtnPause.setDisable(true);
         tbtnPlay.setDisable(true);
@@ -204,7 +193,6 @@ public class Controller {
         ptr = new ArrayList<>();
         initCharts();
 
-
         for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
             pathList.add(new Path());
         }
@@ -219,14 +207,12 @@ public class Controller {
             atoms.add(new Circle(rScaled));
         }
 
-
         reloadChartData();
         animateMolecules();
         calculationStatusLabel.setText("Calculation done");
         tbtnAnim.setDisable(false);
         tbtnChart.setDisable(false);
     }
-
 
     @FXML
     public void btnSaveAction() throws FileNotFoundException {
@@ -253,58 +239,29 @@ public class Controller {
         tbtnChart.setDisable(true);
         tbtnAnim.setDisable(true);
 
-
-        double time = getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> timeToValidate <= 0);
-
-        double step = getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> stepToValidate <= 0 || stepToValidate > 0.05);
-
-        double r0 = getValidValue(txtR0, labelInvalidR0);
-
-        double eps = getValidValue(txtEps, labelInvalidEps);
-
-        double mass = getValidValue(txtMass, labelInvalidMass, massToValidate -> massToValidate <= 0);
-
-        double moleculesReaded = getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0);
-
-        int molecules = (int) moleculesReaded;
-
-        double boxSize = getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate <= 0);
-
-        double wallStiffness = getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0);
-
+        SimulationConditions simulationConditions = readSimulationConditions();
 
         atoms = new ArrayList<>();
         pathList = new ArrayList<>();
 
 
-        double rScaled = r0 / boxSize * root.getWidth();
-        for (int i = 0; i < molecules; i++) {
+        double rScaled = simulationConditions.getMoleculeRadius() / simulationConditions.getBoxSize() * root.getWidth();
+        for (int i = 0; i < simulationConditions.getMoleculesQuantity(); i++) {
             atoms.add(new Circle(rScaled));
             pathList.add(new Path());
         }
 
-        md = new MD(molecules, r0, eps, mass, time, boxSize, wallStiffness);
-
-        int n = (int) Math.floor(time / step);
-
-        molec = new Molecules(molecules, n, r0, eps, boxSize);
+        md = new MD(simulationConditions);
 
         initCharts();
 
-        final double threadStep = step;
-        root.getChildren()
-            .add(calculationStatusLabel);
+        root.getChildren().add(calculationStatusLabel);
         calculationStatusLabel.setText("Calculation in progress");
 
         new Task<Void> () {
             @Override
             public Void call() {
-                double currentTime = 0;
-                for (int i = 0; i < n; i++) {
-                    molec.addRow(i, currentTime, md.getrAtoms(), md.getvAtoms(), md.getaAtoms(), md.getKinE(), md.getPotE(), md.getElastE());
-                    md.verletStep(threadStep);
-                    currentTime += threadStep;
-                }
+                molec = md.caclulateSimulation();
                 prepareAnimationDataAndChart();
                 ptr = new ArrayList<>();
 
@@ -425,8 +382,17 @@ public class Controller {
                .setNode(atoms.get(i));
         }
     }
+
+    private SimulationConditions readSimulationConditions() {
+        return SimulationConditions.builder()
+                .time(getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> timeToValidate <= 0))
+                .timeStep(getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> stepToValidate <= 0 || stepToValidate > 0.05))
+                .moleculeRadius(getValidValue(txtR0, labelInvalidR0))
+                .epsilon(getValidValue(txtEps, labelInvalidEps))
+                .mass(getValidValue(txtMass, labelInvalidMass, massToValidate -> massToValidate <= 0))
+                .moleculesQuantity(getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0).intValue())
+                .boxSize(getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate <= 0))
+                .wallStiffness(getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0))
+                .build();
+    }
 }
-
-
-
-

@@ -10,42 +10,28 @@ public class MD {
     private double potE;
     private double kinE;
     private double elastE;
-    private double time;
 
-    private double mass;
-    private double eps;
-    private double r0;
     private double rCut2;
+    private final SimulationConditions simulationConditions;
 
-    private double boxSize;
-    private double wallStiffness;
-
-
-
-    public MD(int molecules, double r0, double eps, double mass, double time, double boxSize, double wallStiffness) {
+    public MD(SimulationConditions simulationConditions) {
         super();
         Random gen = new Random();
-        this.setnAtoms(molecules);
+        this.simulationConditions = simulationConditions;
+        this.setnAtoms(simulationConditions.getMoleculesQuantity());
         this.setrAtoms(new double[this.getnAtoms()][2]);
         this.setvAtoms(new double[this.getnAtoms()][2]);
         this.setaAtoms(new double[this.getnAtoms()][2]);
-        this.setBoxSize(boxSize);
-        this.setR0(r0);
-        this.setrCut2(Math.pow(2*this.getR0(),2));
-        this.setEps(eps);
-        this.setMass(mass);
+        this.setrCut2(Math.pow(2 * simulationConditions.getMoleculeRadius(), 2));
         this.setPotE(0);
         this.setKinE(0);
-        this.setTime(time);
-        this.setWallStiffness(wallStiffness);
-
         for (int i = 0; i< this.getnAtoms(); i++) {
 
-            this.getrAtoms()[i] = new double[]{Math.abs(gen.nextDouble()* this.getBoxSize() - this.getR0()), Math.abs(gen.nextDouble()* this.getBoxSize() - this.getR0())};
+            this.getrAtoms()[i] = new double[]{Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius()), Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius())};
 
             for(int j=0; j<(i+1); j++) {
-                if ((i!=j)&& ((Math.pow(getrAtoms()[i][0]- getrAtoms()[j][0],2) + Math.pow(getrAtoms()[i][1]- getrAtoms()[j][1],2)) <= (this.getR0() * this.getR0()))) {
-                    this.getrAtoms()[i] = new double[]{Math.abs(gen.nextDouble()* this.getBoxSize() - this.getR0()), Math.abs(gen.nextDouble()* this.getBoxSize() - this.getR0())};
+                if ((i!=j)&& ((Math.pow(getrAtoms()[i][0]- getrAtoms()[j][0],2) + Math.pow(getrAtoms()[i][1]- getrAtoms()[j][1],2)) <= (simulationConditions.getMoleculeRadius() * simulationConditions.getMoleculeRadius()))) {
+                    this.getrAtoms()[i] = new double[]{Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius()), Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius())};
                     j = 0;
                 }
             }
@@ -61,7 +47,22 @@ public class MD {
         this.getvAtoms()[1] = new double[]{-100, 0};
     }
 
-    public void calculateAcc() {
+    public Molecules caclulateSimulation() {
+        Molecules molecules = new Molecules(simulationConditions.getMoleculesQuantity(),
+                                            simulationConditions.getTimeStepsAmount(),
+                                            simulationConditions.getMoleculeRadius(),
+                                            simulationConditions.getEpsilon(),
+                                            simulationConditions.getBoxSize());
+        double currentTime = 0;
+        for (int i = 0; i < simulationConditions.getTimeStepsAmount(); i++) {
+            molecules.addRow(i, currentTime, rAtoms, vAtoms, aAtoms, kinE, potE, elastE);
+            verletStep(simulationConditions.getTimeStep());
+            currentTime += simulationConditions.getTimeStep();
+        }
+        return molecules;
+    }
+
+    private void calculateAcc() {
 
         for(int i=0; i<getnAtoms(); i++) {
             setaAtom(i, new double[]{0, 0});
@@ -83,10 +84,10 @@ public class MD {
                 dy = getrAtoms()[i][1]- getrAtoms()[j][1];
                 rij2 = dx*dx + dy*dy;
                 rij = Math.sqrt(rij2);
-                fr6 = Math.pow(getR0() /rij, 6);
+                fr6 = Math.pow(simulationConditions.getMoleculeRadius() /rij, 6);
 
                 if(rij2< getrCut2()) {
-                    fr = -(48* getEps() /rij2) * fr6*(fr6* - 0.5) / getMass();
+                    fr = -(48 * simulationConditions.getEpsilon() /rij2) * fr6 * (fr6 * - 0.5) / simulationConditions.getMass();
                     fx = fr*dx;
                     fy = fr*dy;
 
@@ -95,7 +96,7 @@ public class MD {
                     getaAtoms()[i][1] += fy;
                     getaAtoms()[j][1] -= fy;
 
-                    setPotE(getPotE() + 2*getEps()*fr6*(fr6-1.0));
+                    setPotE(getPotE() + 2 * simulationConditions.getEpsilon() * fr6 * (fr6 - 1.0));
                 }
             }
         }
@@ -105,26 +106,26 @@ public class MD {
             double d;
             if(rAtoms[i][0] < 0.5) {
                 d = 0.5 - rAtoms[i][0];
-                aAtoms[i][0] += wallStiffness*d;
-                setElastE(getElastE() + 0.5*wallStiffness*d*d*mass);
+                aAtoms[i][0] += simulationConditions.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
             }
 
-            if(rAtoms[i][0] > (boxSize-0.5)) {
-                d = boxSize - 0.5 - rAtoms[i][0];
-                aAtoms[i][0] += wallStiffness*d;
-                setElastE(getElastE() + 0.5*wallStiffness*d*d*mass);
+            if(rAtoms[i][0] > (simulationConditions.getBoxSize()-0.5)) {
+                d = simulationConditions.getBoxSize() - 0.5 - rAtoms[i][0];
+                aAtoms[i][0] += simulationConditions.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
             }
 
             if(rAtoms[i][1] < 0.5) {
                 d = 0.5 - rAtoms[i][1];
-                aAtoms[i][1] += wallStiffness*d;
-                setElastE(getElastE() + 0.5*wallStiffness*d*d*mass);
+                aAtoms[i][1] += simulationConditions.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
             }
 
-            if(rAtoms[i][1] > (boxSize-0.5)) {
-                d = boxSize - 0.5 - rAtoms[i][1];
-                aAtoms[i][1] += wallStiffness*d;
-                setElastE(getElastE() + 0.5*wallStiffness*d*d*mass);
+            if(rAtoms[i][1] > (simulationConditions.getBoxSize() - 0.5)) {
+                d = simulationConditions.getBoxSize() - 0.5 - rAtoms[i][1];
+                aAtoms[i][1] += simulationConditions.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
             }
         }
     }
@@ -133,11 +134,11 @@ public class MD {
     private void kinECacl() {
         setKinE(0);
         for(int i = 0; i< getnAtoms(); i++) {
-            setKinE(getKinE() + getMass() *(Math.pow(getvAtoms()[i][0],2) + Math.pow(getvAtoms()[i][1],2))/2);
+            setKinE(getKinE() + simulationConditions.getMass() *(Math.pow(getvAtoms()[i][0],2) + Math.pow(getvAtoms()[i][1],2))/2);
         }
     }
 
-    public void verletStep(double dt) {
+    private void verletStep(double dt) {
         double[][] tempVAtoms = new double[getnAtoms()][2];
         for(int i = 0; i< getnAtoms(); i++) {
             tempVAtoms[i][0] = getvAtoms()[i][0] + dt* getaAtoms()[i][0]/2;
@@ -207,56 +208,12 @@ public class MD {
         this.kinE = kinE;
     }
 
-    public double getTime() {
-        return time;
-    }
-
-    public void setTime(double time) {
-        this.time = time;
-    }
-
-    public double getMass() {
-        return mass;
-    }
-
-    public void setMass(double mass) {
-        this.mass = mass;
-    }
-
-    public double getEps() {
-        return eps;
-    }
-
-    public void setEps(double eps) {
-        this.eps = eps;
-    }
-
-    public double getR0() {
-        return r0;
-    }
-
-    public void setR0(double r0) {
-        this.r0 = r0;
-    }
-
     public double getrCut2() {
         return rCut2;
     }
 
     public void setrCut2(double rCut2) {
         this.rCut2 = rCut2;
-    }
-
-    public double getBoxSize() {
-        return boxSize;
-    }
-
-    public void setBoxSize(double boxSize) {
-        this.boxSize = boxSize;
-    }
-
-    public void setWallStiffness(double wallStiffness) {
-        this.wallStiffness = wallStiffness;
     }
 
     public double getElastE() {
