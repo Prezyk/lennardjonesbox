@@ -189,6 +189,7 @@ public class Controller {
     }
 
     @FXML
+    //TODO this does not work
     public void btnLoadAction() throws IOException {
         root.getChildren()
             .clear();
@@ -208,49 +209,20 @@ public class Controller {
             pathList.add(new Path());
         }
 
-        for (int i = 0; i < molec.getN(); i++) {
-            for (int a = 0; a < molec.getMoleculesQuantity(); a++) {
-
-                double xCoord = molec.getrVectors()[a][i][0] * root.getWidth() / molec.getBoxSize();
-                double yCoord = root.getWidth() - molec.getrVectors()[a][i][1] * root.getWidth() / molec.getBoxSize();
-
-                if (i == 0) {
-                    pathList.get(a)
-                            .getElements()
-                            .add(new MoveTo(xCoord, yCoord));
-                } else {
-                    pathList.get(a)
-                            .getElements()
-                            .add(new LineTo(xCoord, yCoord));
-                }
-
-            }
-
-            eKin.getData()
-                .add(new XYChart.Data<>(molec.getTime()[i], molec.getEkin()[i]));
-            ePot.getData()
-                .add(new XYChart.Data<>(molec.getTime()[i], molec.getEpot()[i]));
-            eElat.getData()
-                 .add(new XYChart.Data<>(molec.getTime()[i], molec.getElastE()[i]));
-            eTotal.getData()
-                  .add(new XYChart.Data<>(molec.getTime()[i], molec.getEpot()[i] + molec.getEkin()[i] + molec.getElastE()[i]));
-
-
-        }
-//        setChartNames();
-        ptr = new ArrayList<>();
+        animateMoleculesAndPrepareChart();
+        setChartNames();
         atoms = new ArrayList<>();
+        ptr = new ArrayList<>();
+
         double rScaled = molec.getR() / molec.getBoxSize() * root.getWidth();
-
-
         for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
             atoms.add(new Circle(rScaled));
+            ptr.add(new PathTransition());
         }
 
 
         reloadChartData();
         for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
-            ptr.add(new PathTransition());
             ptr.get(i)
                .setDuration(Duration.seconds(molec.getTime()[molec.getTime().length - 1]));
             ptr.get(i)
@@ -327,9 +299,7 @@ public class Controller {
 
         initCharts();
 
-        final double threadBoxSize = boxSize;
         final double threadStep = step;
-        final double threadTime = time;
         root.getChildren()
             .add(calculationStatusLabel);
         calculationStatusLabel.setText("Calculation in progress");
@@ -339,47 +309,18 @@ public class Controller {
             public Void call() {
                 double currentTime = 0;
                 for (int i = 0; i < n; i++) {
-
                     molec.addRow(i, currentTime, md.getrAtoms(), md.getvAtoms(), md.getaAtoms(), md.getKinE(), md.getPotE(), md.getElastE());
-                    double[][] rAtoms = md.getrAtoms();
-
-                    for (int a = 0; a < molecules; a++) {
-
-                        double xCoord = rAtoms[a][0] * root.getWidth() / threadBoxSize;
-                        double yCoord = root.getWidth() - rAtoms[a][1] * root.getWidth() / threadBoxSize;
-                        if (i == 0) {
-                            pathList.get(a)
-                                    .getElements()
-                                    .add(new MoveTo(xCoord, yCoord));
-                        } else {
-                            pathList.get(a)
-                                    .getElements()
-                                    .add(new LineTo(xCoord, yCoord));
-                        }
-                    }
-
-                    eKin.getData()
-                        .add(new XYChart.Data<>(currentTime, md.getKinE()));
-                    ePot.getData()
-                        .add(new XYChart.Data<>(currentTime, md.getPotE()));
-                    eElat.getData()
-                         .add(new XYChart.Data<>(currentTime, md.getElastE()));
-                    eTotal.getData()
-                          .add(new XYChart.Data<>(currentTime, md.getPotE() + md.getKinE() + md.getElastE()));
                     md.verletStep(threadStep);
                     currentTime += threadStep;
-                    tbtnAnim.setDisable(false);
-                    tbtnChart.setDisable(false);
-
-
                 }
+                animateMoleculesAndPrepareChart();
                 ptr = new ArrayList<>();
 
                 reloadChartData();
                 for (int i = 0; i < molecules; i++) {
                     ptr.add(new PathTransition());
                     ptr.get(ptr.size() - 1)
-                       .setDuration(Duration.seconds(threadTime));
+                       .setDuration(Duration.seconds(molec.getTime()[molec.getTime().length - 1]));
                     ptr.get(ptr.size() - 1)
                        .setPath(pathList.get(i));
                     ptr.get(ptr.size() - 1)
@@ -457,6 +398,36 @@ public class Controller {
         figure.getData().add(ePot);
         figure.getData().add(eElat);
         figure.getData().add(eTotal);
+    }
+
+    private void animateMoleculesAndPrepareChart() {
+        for (int i = 0; i < molec.getN(); i++) {
+            for (int a = 0; a < molec.getMoleculesQuantity(); a++) {
+
+                double xCoord = molec.getrVectors()[a][i][0] * root.getWidth() / molec.getBoxSize();
+                double yCoord = root.getWidth() - molec.getrVectors()[a][i][1] * root.getWidth() / molec.getBoxSize();
+                if (i == 0) {
+                    pathList.get(a)
+                            .getElements()
+                            .add(new MoveTo(xCoord, yCoord));
+                } else {
+                    pathList.get(a)
+                            .getElements()
+                            .add(new LineTo(xCoord, yCoord));
+                }
+            }
+
+            eKin.getData()
+                .add(new XYChart.Data<>(molec.getTime()[i], molec.getEkin()[i]));
+            ePot.getData()
+                .add(new XYChart.Data<>(molec.getTime()[i], molec.getEpot()[i]));
+            eElat.getData()
+                 .add(new XYChart.Data<>(molec.getTime()[i], molec.getElastE()[i]));
+            eTotal.getData()
+                  .add(new XYChart.Data<>(molec.getTime()[i], molec.getEpot()[i] + molec.getEkin()[i] + molec.getElastE()[i]));
+            tbtnAnim.setDisable(false);
+            tbtnChart.setDisable(false);
+        }
     }
 }
 

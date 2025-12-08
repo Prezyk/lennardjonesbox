@@ -45,9 +45,17 @@ public class Molecules {
         this.Epot[index] = Epot;
         this.ElastE[index] = ElastE;
         for(int i=0; i<this.moleculesQuantity; i++) {
-            this.rVectors[i][index] = rVector[i];
-            this.aVectors[i][index] = aVector[i];
-            this.vVectors[i][index] = vVector[i];
+            this.rVectors[i][index] = new double[2];
+            this.rVectors[i][index][0] = rVector[i][0];
+            this.rVectors[i][index][1] = rVector[i][1];
+
+            this.aVectors[i][index] = new double[2];
+            this.aVectors[i][index][0] = aVector[i][0];
+            this.aVectors[i][index][1] = aVector[i][1];
+
+            this.vVectors[i][index] = new double[2];
+            this.vVectors[i][index][0] = vVector[i][0];
+            this.vVectors[i][index][1] = vVector[i][1];
         }
     }
 
