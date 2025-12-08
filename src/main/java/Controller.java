@@ -209,7 +209,7 @@ public class Controller {
             pathList.add(new Path());
         }
 
-        animateMoleculesAndPrepareChart();
+        prepareAnimationDataAndChart();
         setChartNames();
         atoms = new ArrayList<>();
         ptr = new ArrayList<>();
@@ -217,19 +217,11 @@ public class Controller {
         double rScaled = molec.getR() / molec.getBoxSize() * root.getWidth();
         for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
             atoms.add(new Circle(rScaled));
-            ptr.add(new PathTransition());
         }
 
 
         reloadChartData();
-        for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
-            ptr.get(i)
-               .setDuration(Duration.seconds(molec.getTime()[molec.getTime().length - 1]));
-            ptr.get(i)
-               .setPath(pathList.get(i));
-            ptr.get(i)
-               .setNode(atoms.get(i));
-        }
+        animateMolecules();
         calculationStatusLabel.setText("Calculation done");
         tbtnAnim.setDisable(false);
         tbtnChart.setDisable(false);
@@ -313,19 +305,11 @@ public class Controller {
                     md.verletStep(threadStep);
                     currentTime += threadStep;
                 }
-                animateMoleculesAndPrepareChart();
+                prepareAnimationDataAndChart();
                 ptr = new ArrayList<>();
 
                 reloadChartData();
-                for (int i = 0; i < molecules; i++) {
-                    ptr.add(new PathTransition());
-                    ptr.get(ptr.size() - 1)
-                       .setDuration(Duration.seconds(molec.getTime()[molec.getTime().length - 1]));
-                    ptr.get(ptr.size() - 1)
-                       .setPath(pathList.get(i));
-                    ptr.get(ptr.size() - 1)
-                       .setNode(atoms.get(i));
-                }
+                animateMolecules();
                 calculationStatusLabel.setText("Calculation done");
                 tbtnAnim.setDisable(false);
                 tbtnChart.setDisable(false);
@@ -400,7 +384,7 @@ public class Controller {
         figure.getData().add(eTotal);
     }
 
-    private void animateMoleculesAndPrepareChart() {
+    private void prepareAnimationDataAndChart() {
         for (int i = 0; i < molec.getN(); i++) {
             for (int a = 0; a < molec.getMoleculesQuantity(); a++) {
 
@@ -427,6 +411,18 @@ public class Controller {
                   .add(new XYChart.Data<>(molec.getTime()[i], molec.getEpot()[i] + molec.getEkin()[i] + molec.getElastE()[i]));
             tbtnAnim.setDisable(false);
             tbtnChart.setDisable(false);
+        }
+    }
+
+    private void animateMolecules() {
+        for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
+            ptr.add(new PathTransition());
+            ptr.get(ptr.size() - 1)
+               .setDuration(Duration.seconds(molec.getTime()[molec.getTime().length - 1]));
+            ptr.get(ptr.size() - 1)
+               .setPath(pathList.get(i));
+            ptr.get(ptr.size() - 1)
+               .setNode(atoms.get(i));
         }
     }
 }
