@@ -27,7 +27,10 @@ import java.util.stream.Collectors;
 public class Controller {
 
     @FXML
-    Pane root;
+    Pane animationPane;
+
+    @FXML
+    Pane chartPane;
 
     @FXML
     GridPane mainLayout;
@@ -40,12 +43,6 @@ public class Controller {
 
     @FXML
     Button tbtnPause;
-
-    @FXML
-    Button tbtnAnim;
-
-    @FXML
-    Button tbtnChart;
 
     @FXML
     Slider sliderMolecules;
@@ -148,30 +145,9 @@ public class Controller {
     }
 
     @FXML
-    public void tbtnAnimAction() {
-        root.getChildren().clear();
-        for (Circle C : atoms) {
-            root.getChildren().add(C);
-        }
-        tbtnPlay.setDisable(false);
-        tbtnPause.setDisable(false);
-        tbtnStop.setDisable(false);
-    }
-
-    @FXML
-    public void tbtnChartAction() {
-        root.getChildren().clear();
-        root.getChildren().add(figure);
-
-        tbtnPause.setDisable(true);
-        tbtnPlay.setDisable(true);
-        tbtnStop.setDisable(true);
-    }
-
-    @FXML
     //TODO this does not work ???
     public void btnLoadAction() throws IOException {
-        root.getChildren()
+        animationPane.getChildren()
             .clear();
         calculationStatusLabel.setText("Load in progress");
         CSVHandler csv = new CSVHandler();
@@ -191,7 +167,7 @@ public class Controller {
         atoms = new ArrayList<>();
         ptr = new ArrayList<>();
 
-        double rScaled = molecules.getR() / molecules.getBoxSize() * root.getWidth();
+        double rScaled = molecules.getR() / molecules.getBoxSize() * animationPane.getWidth();
         for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
             atoms.add(new Circle(rScaled));
         }
@@ -199,8 +175,6 @@ public class Controller {
         reloadChartData(molecules);
         animateMolecules(molecules);
         calculationStatusLabel.setText("Calculation done");
-        tbtnAnim.setDisable(false);
-        tbtnChart.setDisable(false);
     }
 
     @FXML
@@ -211,15 +185,12 @@ public class Controller {
 
     @FXML
     public void btnOkAction() {
-        if (!root.getChildren().isEmpty())
-            root.getChildren().clear();
+        if (!animationPane.getChildren().isEmpty())
+            animationPane.getChildren().clear();
 
         tbtnPause.setDisable(true);
         tbtnPlay.setDisable(true);
         tbtnStop.setDisable(true);
-
-        tbtnChart.setDisable(true);
-        tbtnAnim.setDisable(true);
 
         SimulationConditions simulationConditions = readSimulationConditions();
 
@@ -227,7 +198,7 @@ public class Controller {
         pathList = new ArrayList<>();
 
 
-        double rScaled = simulationConditions.getMoleculeRadius() / simulationConditions.getBoxSize() * root.getWidth();
+        double rScaled = simulationConditions.getMoleculeRadius() / simulationConditions.getBoxSize() * animationPane.getWidth();
         for (int i = 0; i < simulationConditions.getMoleculesQuantity(); i++) {
             atoms.add(new Circle(rScaled));
             pathList.add(new Path());
@@ -235,7 +206,7 @@ public class Controller {
 
         MolecularDynamics molecularDynamics = new MolecularDynamics(simulationConditions);
 
-        root.getChildren().add(calculationStatusLabel);
+        animationPane.getChildren().add(calculationStatusLabel);
         calculationStatusLabel.setText("Calculation in progress");
 
         CompletableFuture<Molecules> futureSimulationResult = molecularDynamics.calculateSimulationConcurrent();
@@ -245,8 +216,12 @@ public class Controller {
             reloadChartData(molecules);
             animateMolecules(molecules);
             calculationStatusLabel.setText("Calculation done");
-            tbtnAnim.setDisable(false);
-            tbtnChart.setDisable(false);
+            tbtnPause.setDisable(false);
+            tbtnPlay.setDisable(false);
+            tbtnStop.setDisable(false);
+            for (Circle C : atoms) {
+                animationPane.getChildren().add(C);
+            }
         }));
     }
 
@@ -284,7 +259,9 @@ public class Controller {
         NumberAxis y = new NumberAxis();
         figure = new ScatterChart<>(x, y);
         figure.setLegendVisible(true);
-        figure.setMinSize(root.getWidth(), root.getHeight());
+        figure.setMinSize(chartPane.getWidth(), chartPane.getHeight());
+        if (chartPane.getChildren().isEmpty())
+            chartPane.getChildren().add(figure);
     }
 
     private void reloadChartData(Molecules molecules) {
@@ -294,6 +271,7 @@ public class Controller {
     }
 
     private void resetChartsIfNeeded(ChartMapper chartMapper) {
+
         List<String> currentChartNames = figure.getData()
                                                .stream()
                                                .map(XYChart.Series::getName)
@@ -317,15 +295,13 @@ public class Controller {
         for (int i = 0; i < molecules.getN(); i++) {
             for (int a = 0; a < molecules.getMoleculesQuantity(); a++) {
 
-                double xCoord = molecules.getrVectors()[a][i][0] * root.getWidth() / molecules.getBoxSize();
-                double yCoord = root.getHeight() - molecules.getrVectors()[a][i][1] * root.getHeight() / molecules.getBoxSize();
+                double xCoord = molecules.getrVectors()[a][i][0] * animationPane.getWidth() / molecules.getBoxSize();
+                double yCoord = animationPane.getHeight() - molecules.getrVectors()[a][i][1] * animationPane.getHeight() / molecules.getBoxSize();
                 pathList.get(a)
                         .getElements()
                         .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
 
             }
-            tbtnAnim.setDisable(false);
-            tbtnChart.setDisable(false);
         }
     }
 

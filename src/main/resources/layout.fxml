@@ -1,45 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-
-<?import javafx.geometry.Insets?>
-<?import javafx.stage.FileChooser?>
+<?xml version="1.0" encoding="UTF-8"?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?><?import javafx.geometry.Insets?><?import javafx.stage.FileChooser?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="Controller"
-            prefHeight="800.0" prefWidth="1100.0"
+            prefHeight="800.0"
+            prefWidth="1100.0"
             stylesheets="@/layout.css">
-    <GridPane fx:id="mainLayout" hgap="50" minHeight="800" minWidth="1100" prefHeight="-Infinity" prefWidth="-Infinity" maxHeight="-Infinity" maxWidth="-Infinity">
+    <GridPane fx:id="mainLayout"
+              hgap="50"
+              minHeight="800"
+              minWidth="1100"
+              prefHeight="-Infinity"
+              prefWidth="-Infinity"
+              maxHeight="-Infinity"
+              maxWidth="-Infinity">
         <columnConstraints>
             <ColumnConstraints percentWidth="20" hgrow="ALWAYS" />
             <ColumnConstraints percentWidth="80" hgrow="ALWAYS" />
         </columnConstraints>
-
         <rowConstraints>
             <RowConstraints percentHeight="100" vgrow="ALWAYS" />
         </rowConstraints>
-
-        <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
-        <Pane fx:id="root"
-              maxWidth="700"
-              maxHeight="700"
-              GridPane.columnIndex="1"
-              GridPane.rowIndex="0"
-              GridPane.columnSpan="1"
-              GridPane.rowSpan="1"
-              styleClass="animation-pane" />
-
-        <VBox spacing="10" alignment="TOP_CENTER">
+        <VBox spacing="10" alignment="TOP_CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0">
             <GridPane maxWidth="300" maxHeight="120">
                 <columnConstraints>
                     <ColumnConstraints percentWidth="50" />
                     <ColumnConstraints percentWidth="50" />
                 </columnConstraints>
-
-                <rowConstraints>
-                </rowConstraints>
                 <Label text="Time"
                        styleClass=""
                        GridPane.columnIndex="0"
@@ -218,7 +204,6 @@
                        GridPane.rowSpan="1"
                        GridPane.halignment="CENTER"
                        GridPane.valignment="TOP" />
-
             </GridPane>
             <GridPane hgap="5" maxWidth="300">
                 <Label text="Molecules"
@@ -254,79 +239,73 @@
                        GridPane.columnSpan="1"
                        GridPane.rowSpan="1"
                        GridPane.halignment="RIGHT" />
-
                 <columnConstraints>
                     <ColumnConstraints percentWidth="65" />
                     <ColumnConstraints percentWidth="35" />
                 </columnConstraints>
-
             </GridPane>
             <Button onAction="#btnOkAction" maxWidth="50" text="Calc" />
-
-            <GridPane maxWidth="300" hgap="8">
-                <Button fx:id="tbtnPlay"
-                        disable="true"
-                        minWidth="55"
-                        text="Play"
-                        onAction="#tbtnPlayAction"
-                        GridPane.columnIndex="0"
-                        GridPane.rowIndex="0"
-                        GridPane.columnSpan="1"
-                        GridPane.rowSpan="1" />
-                <Button fx:id="tbtnPause"
-                        disable="true"
-                        minWidth="75"
-                        text="Pause"
-                        onAction="#tbtnPauseAction"
-                        GridPane.columnIndex="1"
-                        GridPane.rowIndex="0"
-                        GridPane.columnSpan="1"
-                        GridPane.rowSpan="1" />
-                <Button fx:id="tbtnStop"
-                        disable="true"
-                        minWidth="55"
-                        text="Stop"
-                        onAction="#tbtnStopActon"
-                        GridPane.columnIndex="2"
-                        GridPane.rowIndex="0"
-                        GridPane.columnSpan="1"
-                        GridPane.rowSpan="1" />
-            </GridPane>
-
-            <GridPane maxWidth="300" hgap="10">
-
-                    <columnConstraints>
-                        <ColumnConstraints percentWidth="57.5" />
-                        <ColumnConstraints percentWidth="42.5" />
-                    </columnConstraints>
-                <Button fx:id="tbtnAnim"
-                        text="Animation"
-                        disable="true"
-                        onAction="#tbtnAnimAction"
-                        GridPane.columnIndex="0"
-                        GridPane.rowIndex="0"
-                        GridPane.columnSpan="1"
-                        GridPane.rowSpan="1"
-                        GridPane.halignment="CENTER" />
-                <Button fx:id="tbtnChart"
-                        text="Chart"
-                        disable="true"
-                        onAction="#tbtnChartAction"
-                        GridPane.columnIndex="1"
-                        GridPane.rowIndex="0"
-                        GridPane.columnSpan="1"
-                        GridPane.rowSpan="1"
-                        GridPane.halignment="CENTER" />
-
-                </GridPane>
             <Label text="Load" />
             <Button prefWidth="100" onAction="#btnLoadAction" text="Load" />
-
             <fx:define>
-                <FileChooser fx:id="chooser"/>
+                <FileChooser fx:id="chooser" />
             </fx:define>
             <Label text="Save" />
             <Button prefWidth="100" onAction="#btnSaveAction" text="Save" />
         </VBox>
+        <TabPane GridPane.columnIndex="1" GridPane.rowIndex="0" tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Animation">
+                <GridPane maxWidth="800" maxHeight="800" hgap="8">
+                    <Pane fx:id="animationPane"
+                          prefWidth="700"
+                          prefHeight="700"
+                          GridPane.columnIndex="0"
+                          GridPane.rowIndex="0"
+                          GridPane.columnSpan="3"
+                          GridPane.rowSpan="1"
+                          styleClass="animation-pane" />
+                    <Button fx:id="tbtnPlay"
+                            disable="true"
+                            minWidth="55"
+                            text="Play"
+                            onAction="#tbtnPlayAction"
+                            GridPane.columnIndex="0"
+                            GridPane.rowIndex="1"
+                            GridPane.columnSpan="1"
+                            GridPane.rowSpan="1" />
+                    <Button fx:id="tbtnPause"
+                            disable="true"
+                            minWidth="75"
+                            text="Pause"
+                            onAction="#tbtnPauseAction"
+                            GridPane.columnIndex="1"
+                            GridPane.rowIndex="1"
+                            GridPane.columnSpan="1"
+                            GridPane.rowSpan="1" />
+                    <Button fx:id="tbtnStop"
+                            disable="true"
+                            minWidth="55"
+                            text="Stop"
+                            onAction="#tbtnStopActon"
+                            GridPane.columnIndex="2"
+                            GridPane.rowIndex="1"
+                            GridPane.columnSpan="1"
+                            GridPane.rowSpan="1" />
+                </GridPane>
+            </Tab>
+            <Tab text="Chart">
+                <Pane fx:id="chartPane"
+                      prefWidth="700"
+                      prefHeight="700"
+                      GridPane.columnIndex="0"
+                      GridPane.rowIndex="0"
+                      GridPane.columnSpan="3"
+                      GridPane.rowSpan="1"
+                      styleClass="animation-pane" />
+            </Tab>
+        </TabPane>
+        <padding>
+            <Insets top="25" right="25" bottom="25" left="25" />
+        </padding>
     </GridPane>
 </AnchorPane>
