@@ -58,11 +58,11 @@ public class CSVHandler {
 
             sb.append(molecules.getTime()[i])
               .append(",")
-              .append(molecules.getEkin()[i])
+              .append(molecules.getKineticEnergy()[i])
               .append(",")
-              .append(molecules.getEpot()[i])
+              .append(molecules.getPotentialEnergy()[i])
               .append(",")
-              .append(molecules.getElastE()[i])
+              .append(molecules.getBoxElasticEnergy()[i])
               .append(",");
 
             for(int j=0; j<quantity; j++) {

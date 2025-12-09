@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -102,15 +103,7 @@ public class Controller {
 
     ScatterChart<Number, Number> figure;
 
-    NumberAxis x;
-    NumberAxis y;
-
     Label calculationStatusLabel = new Label();
-
-    XYChart.Series<Number, Number> eKin;
-    XYChart.Series<Number, Number> ePot;
-    XYChart.Series<Number, Number> eElat;
-    XYChart.Series<Number, Number> eTotal;
 
     List<PathTransition> ptr;
     ArrayList<Circle> atoms;
@@ -123,7 +116,7 @@ public class Controller {
     public void initialize() {
         sliderMolecules.valueProperty()
                        .addListener(l -> txtMolecules.setText(String.valueOf(sliderMolecules.getValue())));
-        initCharts();
+        initFigure();
     }
 
     @FXML
@@ -178,7 +171,7 @@ public class Controller {
     }
 
     @FXML
-    //TODO this does not work
+    //TODO this does not work ???
     public void btnLoadAction() throws IOException {
         root.getChildren()
             .clear();
@@ -191,14 +184,12 @@ public class Controller {
         molec = csv.load(file.getAbsolutePath());
         pathList = new ArrayList<>();
         ptr = new ArrayList<>();
-        initCharts();
 
         for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
             pathList.add(new Path());
         }
 
-        prepareAnimationDataAndChart();
-        setChartNames();
+        prepareAnimationData();
         atoms = new ArrayList<>();
         ptr = new ArrayList<>();
 
@@ -207,7 +198,7 @@ public class Controller {
             atoms.add(new Circle(rScaled));
         }
 
-        reloadChartData();
+        reloadChartData(molec);
         animateMolecules();
         calculationStatusLabel.setText("Calculation done");
         tbtnAnim.setDisable(false);
@@ -216,21 +207,14 @@ public class Controller {
 
     @FXML
     public void btnSaveAction() throws FileNotFoundException {
-
-
         CSVHandler csv = new CSVHandler();
         csv.save(molec, "GUISaveTest.csv");
-
     }
 
     @FXML
     public void btnOkAction() {
-
-        if (!root.getChildren()
-                 .isEmpty())
-            root.getChildren()
-                .clear();
-
+        if (!root.getChildren().isEmpty())
+            root.getChildren().clear();
 
         tbtnPause.setDisable(true);
         tbtnPlay.setDisable(true);
@@ -253,8 +237,6 @@ public class Controller {
 
         md = new MD(simulationConditions);
 
-        initCharts();
-
         root.getChildren().add(calculationStatusLabel);
         calculationStatusLabel.setText("Calculation in progress");
 
@@ -262,10 +244,10 @@ public class Controller {
             @Override
             public Void call() {
                 molec = md.caclulateSimulation();
-                prepareAnimationDataAndChart();
+                prepareAnimationData();
                 ptr = new ArrayList<>();
 
-                reloadChartData();
+                reloadChartData(molec);
                 animateMolecules();
                 calculationStatusLabel.setText("Calculation done");
                 tbtnAnim.setDisable(false);
@@ -304,68 +286,51 @@ public class Controller {
         return value;
     }
 
-    private void initCharts() {
-        initChartsStructure();
-        resetChartData();
-        setChartNames();
-    }
-
-    private void initChartsStructure() {
-        x = new NumberAxis();
-        y = new NumberAxis();
+    private void initFigure() {
+        NumberAxis x = new NumberAxis();
+        NumberAxis y = new NumberAxis();
         figure = new ScatterChart<>(x, y);
         figure.setLegendVisible(true);
         figure.setMinSize(root.getWidth(), root.getHeight());
     }
 
-    private void resetChartData() {
-        eKin = new XYChart.Series<>();
-        ePot = new XYChart.Series<>();
-        eElat = new XYChart.Series<>();
-        eTotal = new XYChart.Series<>();
+    private void reloadChartData(Molecules molecules) {
+        ChartMapper chartMapper = new ChartMapper(molecules);
+        resetChartsIfNeeded(chartMapper);
+        loadAllCharts(chartMapper);
     }
 
-    private void setChartNames() {
-        eKin.setName("Kinetic E");
-        ePot.setName("Potential E");
-        eElat.setName("Elastic E");
-        eTotal.setName("Total E");
-    }
-
-    private void reloadChartData() {
-        if (!figure.getData().isEmpty())
+    private void resetChartsIfNeeded(ChartMapper chartMapper) {
+        List<String> currentChartNames = figure.getData()
+                                               .stream()
+                                               .map(XYChart.Series::getName)
+                                               .collect(Collectors.toList());
+        if (chartMapper.getNames().size() != currentChartNames.size() || !chartMapper.getNames().containsAll(currentChartNames) ) {
             figure.getData().clear();
-        figure.getData().add(eKin);
-        figure.getData().add(ePot);
-        figure.getData().add(eElat);
-        figure.getData().add(eTotal);
+            initCharts(chartMapper);
+        }
     }
 
-    private void prepareAnimationDataAndChart() {
+    private void initCharts(ChartMapper chartMapper) {
+        chartMapper.getNames().forEach(chartName -> {
+            XYChart.Series<Number, Number> series = new XYChart.Series<>();
+            series.setName(chartName);
+            figure.getData().add(series);
+        });
+    }
+
+
+    private void prepareAnimationData() {
         for (int i = 0; i < molec.getN(); i++) {
             for (int a = 0; a < molec.getMoleculesQuantity(); a++) {
 
                 double xCoord = molec.getrVectors()[a][i][0] * root.getWidth() / molec.getBoxSize();
-                double yCoord = root.getWidth() - molec.getrVectors()[a][i][1] * root.getWidth() / molec.getBoxSize();
-                if (i == 0) {
-                    pathList.get(a)
-                            .getElements()
-                            .add(new MoveTo(xCoord, yCoord));
-                } else {
-                    pathList.get(a)
-                            .getElements()
-                            .add(new LineTo(xCoord, yCoord));
-                }
-            }
+                double yCoord = root.getHeight() - molec.getrVectors()[a][i][1] * root.getHeight() / molec.getBoxSize();
+                pathList.get(a)
+                        .getElements()
+                        .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
 
-            eKin.getData()
-                .add(new XYChart.Data<>(molec.getTime()[i], molec.getEkin()[i]));
-            ePot.getData()
-                .add(new XYChart.Data<>(molec.getTime()[i], molec.getEpot()[i]));
-            eElat.getData()
-                 .add(new XYChart.Data<>(molec.getTime()[i], molec.getElastE()[i]));
-            eTotal.getData()
-                  .add(new XYChart.Data<>(molec.getTime()[i], molec.getEpot()[i] + molec.getEkin()[i] + molec.getElastE()[i]));
+            }
             tbtnAnim.setDisable(false);
             tbtnChart.setDisable(false);
         }
@@ -380,6 +345,22 @@ public class Controller {
                .setPath(pathList.get(i));
             ptr.get(ptr.size() - 1)
                .setNode(atoms.get(i));
+        }
+    }
+
+    private void loadAllCharts(ChartMapper chartMapper) {
+        figure.getData()
+              .forEach(series -> loadChart(series, chartMapper.getTimeSeries(series.getName()), chartMapper.getTimePoints()));
+    }
+
+    private void loadChart(XYChart.Series<Number, Number> series, double[] timeSeries, double[] timePoints) {
+        series.getData().clear();
+
+        if (timeSeries.length != timePoints.length)
+            throw new IllegalArgumentException("Time series should have the same amount of points as time points.");
+
+        for (int i = 0; i < timePoints.length; i++) {
+            series.getData().add(new XYChart.Data<>(timePoints[i], timeSeries[i]));
         }
     }
 
