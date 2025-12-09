@@ -1,6 +1,7 @@
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
-public class MD {
+public class MolecularDynamics {
 
     private int nAtoms;
     private double[][] rAtoms;
@@ -14,7 +15,7 @@ public class MD {
     private double rCut2;
     private final SimulationConditions simulationConditions;
 
-    public MD(SimulationConditions simulationConditions) {
+    public MolecularDynamics(SimulationConditions simulationConditions) {
         super();
         Random gen = new Random();
         this.simulationConditions = simulationConditions;
@@ -47,7 +48,14 @@ public class MD {
         this.getvAtoms()[1] = new double[]{-100, 0};
     }
 
-    public Molecules caclulateSimulation() {
+    public CompletableFuture<Molecules> calculateSimulationConcurrent() {
+        CompletableFuture<Molecules> futureMolecules = new CompletableFuture<>();
+        Runnable calculate = () -> futureMolecules.complete(calculateSimulation());
+        new Thread(calculate).start();
+        return futureMolecules;
+    }
+
+    public Molecules calculateSimulation() {
         Molecules molecules = new Molecules(simulationConditions.getMoleculesQuantity(),
                                             simulationConditions.getTimeStepsAmount(),
                                             simulationConditions.getMoleculeRadius(),

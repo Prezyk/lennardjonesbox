@@ -1,5 +1,5 @@
 import javafx.animation.PathTransition;
-import javafx.concurrent.Task;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -99,8 +100,6 @@ public class Controller {
 
     List<Path> pathList;
 
-    MD md;
-
     ScatterChart<Number, Number> figure;
 
     Label calculationStatusLabel = new Label();
@@ -111,7 +110,6 @@ public class Controller {
 
     @FXML
     FileChooser chooser;
-    Molecules molec;
 
     public void initialize() {
         sliderMolecules.valueProperty()
@@ -181,25 +179,25 @@ public class Controller {
         File file = fileChooser.showOpenDialog(new Stage());
         System.out.println(file.getAbsolutePath());
 
-        molec = csv.load(file.getAbsolutePath());
+        Molecules molecules = csv.load(file.getAbsolutePath());
         pathList = new ArrayList<>();
         ptr = new ArrayList<>();
 
-        for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
+        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
             pathList.add(new Path());
         }
 
-        prepareAnimationData();
+        prepareAnimationData(molecules);
         atoms = new ArrayList<>();
         ptr = new ArrayList<>();
 
-        double rScaled = molec.getR() / molec.getBoxSize() * root.getWidth();
-        for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
+        double rScaled = molecules.getR() / molecules.getBoxSize() * root.getWidth();
+        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
             atoms.add(new Circle(rScaled));
         }
 
-        reloadChartData(molec);
-        animateMolecules();
+        reloadChartData(molecules);
+        animateMolecules(molecules);
         calculationStatusLabel.setText("Calculation done");
         tbtnAnim.setDisable(false);
         tbtnChart.setDisable(false);
@@ -207,8 +205,8 @@ public class Controller {
 
     @FXML
     public void btnSaveAction() throws FileNotFoundException {
-        CSVHandler csv = new CSVHandler();
-        csv.save(molec, "GUISaveTest.csv");
+//        CSVHandler csv = new CSVHandler();
+//        csv.save(molec, "GUISaveTest.csv");
     }
 
     @FXML
@@ -235,26 +233,21 @@ public class Controller {
             pathList.add(new Path());
         }
 
-        md = new MD(simulationConditions);
+        MolecularDynamics molecularDynamics = new MolecularDynamics(simulationConditions);
 
         root.getChildren().add(calculationStatusLabel);
         calculationStatusLabel.setText("Calculation in progress");
 
-        new Task<Void> () {
-            @Override
-            public Void call() {
-                molec = md.caclulateSimulation();
-                prepareAnimationData();
-                ptr = new ArrayList<>();
-
-                reloadChartData(molec);
-                animateMolecules();
-                calculationStatusLabel.setText("Calculation done");
-                tbtnAnim.setDisable(false);
-                tbtnChart.setDisable(false);
-                return null;
-            }
-        }.call();
+        CompletableFuture<Molecules> futureSimulationResult = molecularDynamics.calculateSimulationConcurrent();
+        futureSimulationResult.thenAccept(molecules -> Platform.runLater(() -> {
+            prepareAnimationData(molecules);
+            ptr = new ArrayList<>();
+            reloadChartData(molecules);
+            animateMolecules(molecules);
+            calculationStatusLabel.setText("Calculation done");
+            tbtnAnim.setDisable(false);
+            tbtnChart.setDisable(false);
+        }));
     }
 
     @FXML
@@ -320,12 +313,12 @@ public class Controller {
     }
 
 
-    private void prepareAnimationData() {
-        for (int i = 0; i < molec.getN(); i++) {
-            for (int a = 0; a < molec.getMoleculesQuantity(); a++) {
+    private void prepareAnimationData(Molecules molecules) {
+        for (int i = 0; i < molecules.getN(); i++) {
+            for (int a = 0; a < molecules.getMoleculesQuantity(); a++) {
 
-                double xCoord = molec.getrVectors()[a][i][0] * root.getWidth() / molec.getBoxSize();
-                double yCoord = root.getHeight() - molec.getrVectors()[a][i][1] * root.getHeight() / molec.getBoxSize();
+                double xCoord = molecules.getrVectors()[a][i][0] * root.getWidth() / molecules.getBoxSize();
+                double yCoord = root.getHeight() - molecules.getrVectors()[a][i][1] * root.getHeight() / molecules.getBoxSize();
                 pathList.get(a)
                         .getElements()
                         .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
@@ -336,11 +329,11 @@ public class Controller {
         }
     }
 
-    private void animateMolecules() {
-        for (int i = 0; i < molec.getMoleculesQuantity(); i++) {
+    private void animateMolecules(Molecules molecules) {
+        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
             ptr.add(new PathTransition());
             ptr.get(ptr.size() - 1)
-               .setDuration(Duration.seconds(molec.getTime()[molec.getTime().length - 1]));
+               .setDuration(Duration.seconds(molecules.getTime()[molecules.getTime().length - 1]));
             ptr.get(ptr.size() - 1)
                .setPath(pathList.get(i));
             ptr.get(ptr.size() - 1)
