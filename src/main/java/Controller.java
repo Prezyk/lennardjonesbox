@@ -331,14 +331,16 @@ public class Controller {
 
     private void animateMolecules(Molecules molecules) {
         for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
-            ptr.add(new PathTransition());
-            ptr.get(ptr.size() - 1)
-               .setDuration(Duration.seconds(molecules.getTime()[molecules.getTime().length - 1]));
-            ptr.get(ptr.size() - 1)
-               .setPath(pathList.get(i));
-            ptr.get(ptr.size() - 1)
-               .setNode(atoms.get(i));
+            ptr.add(createPathTransition(atoms.get(i), pathList.get(i), molecules.getDuration()));
         }
+    }
+
+    private PathTransition createPathTransition(Circle node, Path path, double time) {
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.seconds(time));
+        pathTransition.setPath(path);
+        pathTransition.setNode(node);
+        return pathTransition;
     }
 
     private void loadAllCharts(ChartMapper chartMapper) {

@@ -71,6 +71,10 @@ public class Molecules {
         return time;
     }
 
+    public double getDuration() {
+        return time[time.length - 1];
+    }
+
     public int getN() {
         return n;
     }
