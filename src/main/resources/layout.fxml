@@ -20,46 +20,10 @@
         <rowConstraints>
             <RowConstraints percentHeight="100" vgrow="ALWAYS" />
         </rowConstraints>
-        <fx:include fx:id="inputs" source="inputs.fxml" />
+        <fx:include source="inputs.fxml" />
         <TabPane GridPane.columnIndex="1" GridPane.rowIndex="0" tabClosingPolicy="UNAVAILABLE">
             <Tab text="Animation">
-                <GridPane maxWidth="800" maxHeight="800" hgap="8">
-                    <Pane fx:id="animationPane"
-                          prefWidth="700"
-                          prefHeight="700"
-                          GridPane.columnIndex="0"
-                          GridPane.rowIndex="0"
-                          GridPane.columnSpan="3"
-                          GridPane.rowSpan="1"
-                          styleClass="animation-pane" />
-                    <Button fx:id="tbtnPlay"
-                            disable="true"
-                            minWidth="55"
-                            text="Play"
-                            onAction="#tbtnPlayAction"
-                            GridPane.columnIndex="0"
-                            GridPane.rowIndex="1"
-                            GridPane.columnSpan="1"
-                            GridPane.rowSpan="1" />
-                    <Button fx:id="tbtnPause"
-                            disable="true"
-                            minWidth="75"
-                            text="Pause"
-                            onAction="#tbtnPauseAction"
-                            GridPane.columnIndex="1"
-                            GridPane.rowIndex="1"
-                            GridPane.columnSpan="1"
-                            GridPane.rowSpan="1" />
-                    <Button fx:id="tbtnStop"
-                            disable="true"
-                            minWidth="55"
-                            text="Stop"
-                            onAction="#tbtnStopActon"
-                            GridPane.columnIndex="2"
-                            GridPane.rowIndex="1"
-                            GridPane.columnSpan="1"
-                            GridPane.rowSpan="1" />
-                </GridPane>
+                <fx:include source="animation.fxml"/>
             </Tab>
             <Tab text="Chart">
                 <Pane fx:id="chartPane"

@@ -1,10 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?><?import javafx.scene.layout.*?><?import javafx.stage.FileChooser?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="InputsController">
-
-<VBox
+<?xml version="1.0" encoding="UTF-8"?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?><?import javafx.stage.FileChooser?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="InputsController"
       spacing="10"
       alignment="TOP_CENTER"
       GridPane.columnIndex="0"
@@ -241,4 +238,3 @@
     <Label text="Save" />
     <Button prefWidth="100" onAction="#btnSaveAction" text="Save" />
 </VBox>
-</AnchorPane>
