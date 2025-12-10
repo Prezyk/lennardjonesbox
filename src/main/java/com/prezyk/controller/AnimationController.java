@@ -1,3 +1,10 @@
+package com.prezyk.controller;
+
+import com.prezyk.event.EventDispatcher;
+import com.prezyk.event.SimulationCalculationsFinishedEvent;
+import com.prezyk.event.SimulationConditionsConfirmedEvent;
+import com.prezyk.md.Molecules;
+import com.prezyk.md.SimulationConditions;
 import javafx.animation.PathTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -137,7 +144,4 @@ public class AnimationController {
             }
         });
     }
-
-
-
-    }
+}

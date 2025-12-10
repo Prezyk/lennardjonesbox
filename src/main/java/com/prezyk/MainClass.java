@@ -1,3 +1,5 @@
+package com.prezyk;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,7 +11,7 @@ public class MainClass extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("layout.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("layout.fxml"));
 
         AnchorPane root = loader.load();
 

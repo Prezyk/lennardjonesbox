@@ -1,3 +1,7 @@
+package com.prezyk.util;
+
+import com.prezyk.md.Molecules;
+
 import java.io.*;
 
 public class CSVHandler {

@@ -1,3 +1,5 @@
+package com.prezyk.md;
+
 public class SimulationConditions {
     private final int moleculesQuantity;
     private final double moleculeRadius;

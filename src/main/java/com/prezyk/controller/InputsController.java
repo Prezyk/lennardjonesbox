@@ -1,3 +1,8 @@
+package com.prezyk.controller;
+
+import com.prezyk.event.EventDispatcher;
+import com.prezyk.md.SimulationConditions;
+import com.prezyk.event.SimulationConditionsConfirmedEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -72,40 +77,40 @@ public class InputsController {
     @FXML
     //TODO this does not work ???
     public void btnLoadAction() throws IOException {
-//        animationPane.getChildren()
-//                     .clear();
-//        calculationStatusLabel.setText("Load in progress");
-//        CSVHandler csv = new CSVHandler();
-//        FileChooser fileChooser = new FileChooser();
-//        File file = fileChooser.showOpenDialog(new Stage());
-//        System.out.println(file.getAbsolutePath());
-//
-//        Molecules molecules = csv.load(file.getAbsolutePath());
-//        pathList = new ArrayList<>();
-//        ptr = new ArrayList<>();
-//
-//        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
-//            pathList.add(new Path());
-//        }
-//
-//        prepareAnimationData(molecules);
-//        atoms = new ArrayList<>();
-//        ptr = new ArrayList<>();
-//
-//        double rScaled = molecules.getR() / molecules.getBoxSize() * animationPane.getWidth();
-//        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
-//            atoms.add(new Circle(rScaled));
-//        }
-//
-//        reloadChartData(molecules);
-//        animateMolecules(molecules);
-//        calculationStatusLabel.setText("Calculation done");
+        //        animationPane.getChildren()
+        //                     .clear();
+        //        calculationStatusLabel.setText("Load in progress");
+        //        com.prezyk.util.CSVHandler csv = new com.prezyk.util.CSVHandler();
+        //        FileChooser fileChooser = new FileChooser();
+        //        File file = fileChooser.showOpenDialog(new Stage());
+        //        System.out.println(file.getAbsolutePath());
+        //
+        //        com.prezyk.md.Molecules molecules = csv.load(file.getAbsolutePath());
+        //        pathList = new ArrayList<>();
+        //        ptr = new ArrayList<>();
+        //
+        //        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
+        //            pathList.add(new Path());
+        //        }
+        //
+        //        prepareAnimationData(molecules);
+        //        atoms = new ArrayList<>();
+        //        ptr = new ArrayList<>();
+        //
+        //        double rScaled = molecules.getR() / molecules.getBoxSize() * animationPane.getWidth();
+        //        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
+        //            atoms.add(new Circle(rScaled));
+        //        }
+        //
+        //        reloadChartData(molecules);
+        //        animateMolecules(molecules);
+        //        calculationStatusLabel.setText("Calculation done");
     }
 
     @FXML
     public void btnSaveAction() throws FileNotFoundException {
-//        CSVHandler csv = new CSVHandler();
-//        csv.save(molec, "GUISaveTest.csv");
+        //        com.prezyk.util.CSVHandler csv = new com.prezyk.util.CSVHandler();
+        //        csv.save(molec, "GUISaveTest.csv");
     }
 
     @FXML
@@ -158,5 +163,4 @@ public class InputsController {
                                    .wallStiffness(getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0))
                                    .build();
     }
-
 }

@@ -1,3 +1,7 @@
+package com.prezyk.controller;
+
+import com.prezyk.md.Molecules;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -1,28 +1,27 @@
+package com.prezyk.controller;
+
+import com.prezyk.event.EventDispatcher;
+import com.prezyk.md.Molecules;
+import com.prezyk.event.SimulationCalculationsFinishedEvent;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class Controller {
+public class ChartsController {
 
     @FXML
     Pane chartPane;
-
-    @FXML
-    GridPane mainLayout;
 
     ScatterChart<Number, Number> figure;
 
     public void initialize() {
         EventDispatcher eventDispatcher = EventDispatcher.getInstance();
-        eventDispatcher.registerEventHandler(SimulationConditionsConfirmedEvent.class, this::simulationConditionsConfirmedEventHandler);
         eventDispatcher.registerEventHandler(SimulationCalculationsFinishedEvent.class, this::simulationCalculationsFinishedEventHandler);
         initFigure();
     }
@@ -79,20 +78,9 @@ public class Controller {
         }
     }
 
-    private void simulationConditionsConfirmedEventHandler(SimulationConditionsConfirmedEvent event) {
-
-        SimulationConditions simulationConditions = event.getSimulationConditions();
-
-        MolecularDynamics molecularDynamics = new MolecularDynamics(simulationConditions);
-
-        CompletableFuture<Molecules> futureSimulationResult = molecularDynamics.calculateSimulationConcurrent();
-
-        futureSimulationResult.thenAccept(molecules -> EventDispatcher.getInstance()
-                                                                      .dispatchEvent(new SimulationCalculationsFinishedEvent(molecules)));
-    }
-
     private void simulationCalculationsFinishedEventHandler(SimulationCalculationsFinishedEvent event) {
         Molecules molecules = event.getMolecules();
         Platform.runLater(() -> reloadChartData(molecules));
     }
+
 }

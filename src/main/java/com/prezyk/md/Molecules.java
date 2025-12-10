@@ -1,3 +1,5 @@
+package com.prezyk.md;
+
 public class Molecules {
 
     private final int moleculesQuantity;
@@ -16,7 +18,7 @@ public class Molecules {
 
 
 
-    Molecules(int moleculesQuantity, int n, double r, double eps, double boxSize) {
+    public Molecules(int moleculesQuantity, int n, double r, double eps, double boxSize) {
         this.n = n;
         this.moleculesQuantity = moleculesQuantity;
         this.r = r;

@@ -1,3 +1,7 @@
+package com.prezyk.event;
+
+import com.prezyk.md.Molecules;
+
 public class SimulationCalculationsFinishedEvent implements Event {
     private final Molecules molecules;
 

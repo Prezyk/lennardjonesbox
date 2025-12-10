@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><?import javafx.geometry.Insets?><?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="Controller"
+            fx:controller="com.prezyk.controller.RootController"
             prefHeight="800.0"
             prefWidth="1100.0"
             stylesheets="@/layout.css">
@@ -26,14 +26,7 @@
                 <fx:include source="animation.fxml"/>
             </Tab>
             <Tab text="Chart">
-                <Pane fx:id="chartPane"
-                      prefWidth="700"
-                      prefHeight="700"
-                      GridPane.columnIndex="0"
-                      GridPane.rowIndex="0"
-                      GridPane.columnSpan="3"
-                      GridPane.rowSpan="1"
-                      styleClass="animation-pane" />
+                <fx:include source="charts.fxml"/>
             </Tab>
         </TabPane>
         <padding>
