@@ -4,19 +4,14 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
-
 public class MainClass extends Application {
     Stage stage;
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
-        FXMLLoader loader = new FXMLLoader();
-        String fxmlDocPath = "/home/kacper/IdeaProjects/lennardjonesbox/src/main/resources/layout.fxml";
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("layout.fxml"));
 
-        FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
-
-        AnchorPane root = loader.load(fxmlStream);
+        AnchorPane root = loader.load();
 
         Scene scene = new Scene(root);
 
