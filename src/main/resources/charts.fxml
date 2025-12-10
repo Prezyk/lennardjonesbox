@@ -1,8 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?><?import javafx.scene.layout.Pane?>
+<?xml version="1.0" encoding="UTF-8"?><?import javafx.scene.layout.Pane?><?import javafx.scene.chart.ScatterChart?><?import javafx.scene.chart.NumberAxis?>
 <Pane fx:id="chartPane"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.prezyk.controller.ChartsController"
-      prefWidth="700"
-      prefHeight="700"
-      styleClass="animation-pane" />
+      prefWidth="800"
+      prefHeight="800"
+      styleClass="animation-pane" >
+    <ScatterChart fx:id="chart" prefHeight="800" prefWidth="800">
+        <xAxis>
+            <NumberAxis/>
+        </xAxis>
+        <yAxis>
+            <NumberAxis/>
+        </yAxis>
+    </ScatterChart>
+</Pane>

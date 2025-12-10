@@ -191,7 +191,7 @@
                GridPane.valignment="TOP" />
     </GridPane>
     <GridPane hgap="5" maxWidth="300">
-        <Label text="com.prezyk.md.Molecules"
+        <Label text="Molecules"
                GridPane.columnIndex="0"
                GridPane.rowIndex="0"
                GridPane.columnSpan="2"
