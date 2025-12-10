@@ -1,31 +1,21 @@
 import javafx.animation.PathTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -62,6 +52,7 @@ public class Controller {
     public void initialize() {
         EventDispatcher eventDispatcher = EventDispatcher.getInstance();
         eventDispatcher.registerEventHandler(SimulationConditionsConfirmedEvent.class, this::simulationConditionsConfirmedEventHandler);
+        eventDispatcher.registerEventHandler(SimulationCalculationsFinishedEvent.class, this::simulationCalculationsFinishedEventHandler);
         initFigure();
     }
 
@@ -203,7 +194,13 @@ public class Controller {
 
         CompletableFuture<Molecules> futureSimulationResult = molecularDynamics.calculateSimulationConcurrent();
 
-        futureSimulationResult.thenAccept(molecules -> Platform.runLater(() -> {
+        futureSimulationResult.thenAccept(molecules -> EventDispatcher.getInstance()
+                                                                      .dispatchEvent(new SimulationCalculationsFinishedEvent(molecules)));
+    }
+
+    private void simulationCalculationsFinishedEventHandler(SimulationCalculationsFinishedEvent event) {
+        Molecules molecules = event.getMolecules();
+        Platform.runLater(() -> {
             prepareAnimationData(molecules);
             ptr = new ArrayList<>();
             reloadChartData(molecules);
@@ -215,6 +212,6 @@ public class Controller {
             for (Circle C : atoms) {
                 animationPane.getChildren().add(C);
             }
-        }));
+        });
     }
 }
