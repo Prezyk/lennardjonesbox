@@ -39,8 +39,8 @@ public class InitialConditionsGenerator {
     private double[] generateInitialVelocity() {
         Random random = new Random();
         return new double[] {
-                random.nextDouble() * 20 - 10,
-                random.nextDouble() * 20 - 10,
+                random.nextDouble() * 40 - 20,
+                random.nextDouble() * 40 - 20,
         };
     }
 

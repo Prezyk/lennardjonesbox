@@ -5,11 +5,14 @@ import java.util.concurrent.CompletableFuture;
 
 public class MolecularDynamics {
 
+    private static final int X_COORDINATE = 0;
+    private static final int Y_COORDINATE = 1;
+    private static final double ELASTIC_INFLUENCE_THRESHOLD = 0.5;
+
     private double potE;
     private double kinE;
     private double elastE;
 
-    private double rCut2;
     private final SimulationInput simulationInput;
     private final Simulation simulation;
     private final MoleculeState[] currentMoleculesStates;
@@ -17,8 +20,6 @@ public class MolecularDynamics {
     public MolecularDynamics(SimulationInput simulationInput) {
         super();
         this.simulationInput = simulationInput;
-
-        this.setrCut2(Math.pow(2 * simulationInput.getMoleculeRadius(), 2));
         this.setPotE(0);
         this.setKinE(0);
         simulation = new Simulation(simulationInput);
@@ -93,30 +94,44 @@ public class MolecularDynamics {
 
     private void calculateElasticInteraction() {
         double elasticEnergyFactor = 0;
-        for(int i=0; i < simulationInput.getMoleculesQuantity(); i++) {
-            double d = 0;
-            if(currentMoleculesStates[i].getPositionVector()[0] < 0.5) {
-                d = 0.5 - currentMoleculesStates[i].getPositionVector()[0];
-                currentMoleculesStates[i].getAccelerationVector()[0] += simulationInput.getWallStiffness() * d;
-            }
-
-            if(currentMoleculesStates[i].getPositionVector()[0] > (simulationInput.getBoxSize()-0.5)) {
-                d = simulationInput.getBoxSize() - 0.5 - currentMoleculesStates[i].getPositionVector()[0];
-                currentMoleculesStates[i].getAccelerationVector()[0] += simulationInput.getWallStiffness() * d;
-            }
-
-            if(currentMoleculesStates[i].getPositionVector()[1] < 0.5) {
-                d = 0.5 - currentMoleculesStates[i].getPositionVector()[1];
-                currentMoleculesStates[i].getAccelerationVector()[1] += simulationInput.getWallStiffness() * d;
-            }
-
-            if(currentMoleculesStates[i].getPositionVector()[1] > (simulationInput.getBoxSize() - 0.5)) {
-                d = simulationInput.getBoxSize() - 0.5 - currentMoleculesStates[i].getPositionVector()[1];
-                currentMoleculesStates[i].getAccelerationVector()[1] += simulationInput.getWallStiffness() * d;
-            }
+        for(int i = 0; i < simulationInput.getMoleculesQuantity(); i++) {
+            double d = calculateElasticInteraction(i, X_COORDINATE);
+            d += calculateElasticInteraction(i, Y_COORDINATE);
             elasticEnergyFactor += Math.pow(d, 2);
         }
         calculateElasticEnergy(elasticEnergyFactor);
+    }
+
+
+    private double calculateElasticInteraction(int moleculeIndex, int coordinate) {
+        return calculateLowerBoundInfluenceIfAround(moleculeIndex, coordinate)
+                + calculateUpperBoundInfluenceIfAround(moleculeIndex, coordinate);
+    }
+    
+    private double calculateLowerBoundInfluenceIfAround(int moleculeIndex, int coordinate) {
+        double d = 0;
+        if(isAroundLowerBound(moleculeIndex, coordinate)) {
+            d = ELASTIC_INFLUENCE_THRESHOLD - currentMoleculesStates[moleculeIndex].getPositionVector()[coordinate];
+            currentMoleculesStates[moleculeIndex].getAccelerationVector()[coordinate] += simulationInput.getWallStiffness() * d;
+        }
+        return d;
+    }
+    
+    private double calculateUpperBoundInfluenceIfAround(int moleculeIndex, int coordinate) {
+        double d = 0;
+        if(isAroundUpperBound(moleculeIndex, coordinate)) {
+            d = simulationInput.getBoxSize() - ELASTIC_INFLUENCE_THRESHOLD - currentMoleculesStates[moleculeIndex].getPositionVector()[coordinate];
+            currentMoleculesStates[moleculeIndex].getAccelerationVector()[coordinate] += simulationInput.getWallStiffness() * d;
+        }
+        return d;
+    }
+
+    private boolean isAroundLowerBound(int moleculeIndex, int coordinate) {
+        return currentMoleculesStates[moleculeIndex].getPositionVector()[coordinate] < ELASTIC_INFLUENCE_THRESHOLD;
+    }
+
+    private boolean isAroundUpperBound(int moleculeIndex, int coordinate) {
+        return currentMoleculesStates[moleculeIndex].getPositionVector()[coordinate] > (simulationInput.getBoxSize() - ELASTIC_INFLUENCE_THRESHOLD);
     }
 
     private double calcRcut2(SimulationInput simulationInput) {
@@ -182,14 +197,6 @@ public class MolecularDynamics {
 
     public void setKinE(double kinE) {
         this.kinE = kinE;
-    }
-
-    public double getrCut2() {
-        return rCut2;
-    }
-
-    public void setrCut2(double rCut2) {
-        this.rCut2 = rCut2;
     }
 
     public double getElastE() {

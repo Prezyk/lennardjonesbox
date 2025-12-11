@@ -53,7 +53,6 @@ public class AnimationController {
             stop = false;
             for (PathTransition P : ptr) {
                 P.playFromStart();
-                System.out.println("Play next");
             }
         } else {
             for (PathTransition P : ptr) {
