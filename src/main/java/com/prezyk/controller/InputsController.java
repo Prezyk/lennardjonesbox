@@ -1,7 +1,7 @@
 package com.prezyk.controller;
 
 import com.prezyk.event.EventDispatcher;
-import com.prezyk.md.SimulationConditions;
+import com.prezyk.md.SimulationInput;
 import com.prezyk.event.SimulationConditionsConfirmedEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -115,7 +115,7 @@ public class InputsController {
 
     @FXML
     public void btnOkAction() {
-        SimulationConditions simulationConditions = readSimulationConditions();
+        SimulationInput simulationConditions = readSimulationConditions();
 
         SimulationConditionsConfirmedEvent simulationConditionsConfirmedEvent = new SimulationConditionsConfirmedEvent(simulationConditions);
         EventDispatcher.getInstance().dispatchEvent(simulationConditionsConfirmedEvent);
@@ -151,16 +151,16 @@ public class InputsController {
     }
 
 
-    private SimulationConditions readSimulationConditions() {
-        return SimulationConditions.builder()
-                                   .time(getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> timeToValidate <= 0))
-                                   .timeStep(getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> stepToValidate <= 0 || stepToValidate > 0.05))
-                                   .moleculeRadius(getValidValue(txtR0, labelInvalidR0))
-                                   .epsilon(getValidValue(txtEps, labelInvalidEps))
-                                   .mass(getValidValue(txtMass, labelInvalidMass, massToValidate -> massToValidate <= 0))
-                                   .moleculesQuantity(getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0).intValue())
-                                   .boxSize(getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate <= 0))
-                                   .wallStiffness(getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0))
-                                   .build();
+    private SimulationInput readSimulationConditions() {
+        return SimulationInput.builder()
+                              .time(getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> timeToValidate <= 0))
+                              .timeStep(getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> stepToValidate <= 0 || stepToValidate > 0.05))
+                              .moleculeRadius(getValidValue(txtR0, labelInvalidR0))
+                              .epsilon(getValidValue(txtEps, labelInvalidEps))
+                              .mass(getValidValue(txtMass, labelInvalidMass, massToValidate -> massToValidate <= 0))
+                              .moleculesQuantity(getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0).intValue())
+                              .boxSize(getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate <= 0))
+                              .wallStiffness(getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0))
+                              .build();
     }
 }

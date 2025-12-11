@@ -46,9 +46,12 @@ public class Simulation {
         this.boxElasticEnergy[timePoint] = boxElasticEnergy;
         this.totalEnergy[timePoint] = kineticEnergy + potentialEnergy + boxElasticEnergy;
         for(int i=0; i<this.moleculesQuantity; i++) {
-            this.molecules[i].setPositionVector(rVector[i], timePoint);
-            this.molecules[i].setVelocityVector(vVector[i], timePoint);
-            this.molecules[i].setAccelerationVector(aVector[i], timePoint);
+            MoleculeState moleculeState = MoleculeState.builder()
+                                                       .positionVector(rVector[i])
+                                                       .velocityVector(vVector[i])
+                                                       .accelerationVector(aVector[i])
+                                                       .build();
+            this.molecules[i].setState(timePoint, moleculeState);
         }
     }
 
@@ -66,20 +69,20 @@ public class Simulation {
 
     public double[][][] getrVectors() {
         return Arrays.stream(this.molecules)
-              .map(Molecule::getPositionVectors)
-                                    .toArray(double[][][]::new);
+                                 .map(Molecule::getPositionVectors)
+                                 .toArray(double[][][]::new);
     }
 
     public double[][][] getvVectors() {
         return Arrays.stream(this.molecules)
-                                    .map(Molecule::getVelocityVectors)
-                                    .toArray(double[][][]::new);
+                                 .map(Molecule::getVelocityVectors)
+                                 .toArray(double[][][]::new);
     }
 
     public double[][][] getaVectors() {
         return Arrays.stream(this.molecules)
-                                    .map(Molecule::getAccelerationVectors)
-                                    .toArray(double[][][]::new);
+                                 .map(Molecule::getAccelerationVectors)
+                                 .toArray(double[][][]::new);
     }
 
     public double[] getKineticEnergy() {

@@ -5,7 +5,7 @@ import com.prezyk.event.SimulationCalculationsFinishedEvent;
 import com.prezyk.event.SimulationConditionsConfirmedEvent;
 import com.prezyk.md.MolecularDynamics;
 import com.prezyk.md.Simulation;
-import com.prezyk.md.SimulationConditions;
+import com.prezyk.md.SimulationInput;
 import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
 
@@ -23,7 +23,7 @@ public class RootController {
 
     private void simulationConditionsConfirmedEventHandler(SimulationConditionsConfirmedEvent event) {
 
-        SimulationConditions simulationConditions = event.getSimulationConditions();
+        SimulationInput simulationConditions = event.getSimulationConditions();
 
         MolecularDynamics molecularDynamics = new MolecularDynamics(simulationConditions);
 

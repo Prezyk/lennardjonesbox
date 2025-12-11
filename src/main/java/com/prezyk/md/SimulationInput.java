@@ -1,6 +1,6 @@
 package com.prezyk.md;
 
-public class SimulationConditions {
+public class SimulationInput {
     private final int moleculesQuantity;
     private final double moleculeRadius;
     private final double epsilon;
@@ -10,7 +10,7 @@ public class SimulationConditions {
     private final double boxSize;
     private final double wallStiffness;
 
-    private SimulationConditions(int moleculesQuantity, double moleculeRadius, double epsilon, double mass, double time, double timeStep, double boxSize, double wallStiffness) {
+    private SimulationInput(int moleculesQuantity, double moleculeRadius, double epsilon, double mass, double time, double timeStep, double boxSize, double wallStiffness) {
         this.moleculesQuantity = moleculesQuantity;
         this.moleculeRadius = moleculeRadius;
         this.epsilon = epsilon;
@@ -77,15 +77,15 @@ public class SimulationConditions {
             return this;
         }
 
-        public SimulationConditions build() {
-            return new SimulationConditions(moleculesQuantity,
-                                            moleculeRadius,
-                                            epsilon,
-                                            mass,
-                                            time,
-                                            timeStep,
-                                            boxSize,
-                                            wallStiffness);
+        public SimulationInput build() {
+            return new SimulationInput(moleculesQuantity,
+                                       moleculeRadius,
+                                       epsilon,
+                                       mass,
+                                       time,
+                                       timeStep,
+                                       boxSize,
+                                       wallStiffness);
         }
     }
 

@@ -15,9 +15,9 @@ public class MolecularDynamics {
     private double elastE;
 
     private double rCut2;
-    private final SimulationConditions simulationConditions;
+    private final SimulationInput simulationConditions;
 
-    public MolecularDynamics(SimulationConditions simulationConditions) {
+    public MolecularDynamics(SimulationInput simulationConditions) {
         super();
         Random gen = new Random();
         this.simulationConditions = simulationConditions;
