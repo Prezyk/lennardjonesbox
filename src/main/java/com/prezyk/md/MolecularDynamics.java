@@ -24,9 +24,8 @@ public class MolecularDynamics {
         simulation = new Simulation(simulationInput);
         InitialConditionsGenerator initialConditionsGenerator = new InitialConditionsGenerator(simulationInput);
         currentMoleculesStates = initialConditionsGenerator.generateInitialConditions();
-
-        calculateAcc();
-        kinECacl();
+        calculateMoleculesAcceleration();
+        calculateKineticEnergy();
         simulation.setState(0, 0, new BoxState(getKinE(), getElastE(), getPotE()), Arrays.stream(currentMoleculesStates)
                                                                                                            .map(MoleculeState::clone)
                                                                                                            .toArray(MoleculeState[]::new));
@@ -52,11 +51,10 @@ public class MolecularDynamics {
         return molecules;
     }
 
-    private void calculateAcc() {
-
-        for(int i=0; i< currentMoleculesStates.length; i++) {
-            currentMoleculesStates[i].getAccelerationVector()[0] = 0;
-            currentMoleculesStates[i].getAccelerationVector()[1] = 0;
+    private void calculateMoleculesAcceleration() {
+        for (MoleculeState currentMoleculesState : currentMoleculesStates) {
+            currentMoleculesState.getAccelerationVector()[0] = 0;
+            currentMoleculesState.getAccelerationVector()[1] = 0;
         }
 
         double rij2;
@@ -91,64 +89,84 @@ public class MolecularDynamics {
                 }
             }
         }
+    }
 
-        setElastE(0);
+    private void calculateElasticInteraction() {
+        double elasticEnergyFactor = 0;
         for(int i=0; i < simulationInput.getMoleculesQuantity(); i++) {
-            double d;
+            double d = 0;
             if(currentMoleculesStates[i].getPositionVector()[0] < 0.5) {
                 d = 0.5 - currentMoleculesStates[i].getPositionVector()[0];
                 currentMoleculesStates[i].getAccelerationVector()[0] += simulationInput.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
 
             if(currentMoleculesStates[i].getPositionVector()[0] > (simulationInput.getBoxSize()-0.5)) {
                 d = simulationInput.getBoxSize() - 0.5 - currentMoleculesStates[i].getPositionVector()[0];
                 currentMoleculesStates[i].getAccelerationVector()[0] += simulationInput.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
 
             if(currentMoleculesStates[i].getPositionVector()[1] < 0.5) {
                 d = 0.5 - currentMoleculesStates[i].getPositionVector()[1];
                 currentMoleculesStates[i].getAccelerationVector()[1] += simulationInput.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
 
             if(currentMoleculesStates[i].getPositionVector()[1] > (simulationInput.getBoxSize() - 0.5)) {
                 d = simulationInput.getBoxSize() - 0.5 - currentMoleculesStates[i].getPositionVector()[1];
                 currentMoleculesStates[i].getAccelerationVector()[1] += simulationInput.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
+            elasticEnergyFactor += Math.pow(d, 2);
         }
+        calculateElasticEnergy(elasticEnergyFactor);
     }
 
     private double calcRcut2(SimulationInput simulationInput) {
         return Math.pow(2 * simulationInput.getMoleculeRadius(), 2);
     }
 
+    private void verletStep() {
+        double[][] tempVelocity = calculateTempVelocity();
+        calculateMoleculesPosition(tempVelocity);
+        calculateMoleculesAcceleration();
+        calculateElasticInteraction();
+        calculateMoleculesVelocity(tempVelocity);
+        calculateKineticEnergy();
+    }
 
-    private void kinECacl() {
-        setKinE(0);
-        for(int i = 0; i< currentMoleculesStates.length; i++) {
-            setKinE(getKinE() + simulationInput.getMass() *(Math.pow(currentMoleculesStates[i].getVelocityVector()[0], 2) + Math.pow(currentMoleculesStates[i].getVelocityVector()[1], 2))/2);
+    private void calculateMoleculesPosition(double[][] tempVelocity) {
+        for(int i = 0; i < currentMoleculesStates.length; i++) {
+            currentMoleculesStates[i].getPositionVector()[0] += simulationInput.getTimeStep() * tempVelocity[i][0];
+            currentMoleculesStates[i].getPositionVector()[1] += simulationInput.getTimeStep() * tempVelocity[i][1];
         }
     }
 
-    private void verletStep() {
+    private double[][] calculateTempVelocity() {
         double[][] tempVAtoms = new double[currentMoleculesStates.length][2];
         for(int i = 0; i < currentMoleculesStates.length; i++) {
             tempVAtoms[i][0] = currentMoleculesStates[i].getVelocityVector()[0] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[0]/2;
             tempVAtoms[i][1] = currentMoleculesStates[i].getVelocityVector()[1] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[1]/2;
 
-            currentMoleculesStates[i].getPositionVector()[0] += simulationInput.getTimeStep() * tempVAtoms[i][0];
-            currentMoleculesStates[i].getPositionVector()[1] += simulationInput.getTimeStep() * tempVAtoms[i][1];
         }
-        calculateAcc();
-        for(int i = 0; i < currentMoleculesStates.length; i++) {
-            currentMoleculesStates[i].getVelocityVector()[0] = tempVAtoms[i][0] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[0]/2;
-            currentMoleculesStates[i].getVelocityVector()[1] = tempVAtoms[i][1] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[1]/2;
-        }
-        kinECacl();
+        return tempVAtoms;
     }
+
+    private void calculateMoleculesVelocity(double[][] tempVelocity) {
+        for(int i = 0; i < currentMoleculesStates.length; i++) {
+            currentMoleculesStates[i].getVelocityVector()[0] = tempVelocity[i][0] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[0]/2;
+            currentMoleculesStates[i].getVelocityVector()[1] = tempVelocity[i][1] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[1]/2;
+        }
+    }
+
+    private void calculateKineticEnergy() {
+        setKinE(0);
+        for (MoleculeState currentMoleculesState : currentMoleculesStates) {
+            setKinE(getKinE() + simulationInput.getMass() * (Math.pow(currentMoleculesState.getVelocityVector()[0], 2) + Math.pow(currentMoleculesState.getVelocityVector()[1], 2)) / 2);
+        }
+    }
+
+    private void calculateElasticEnergy(double elasticEnergyFactor) {
+        setElastE(elasticEnergyFactor * 0.5 * simulationInput.getWallStiffness()  * simulationInput.getMass());
+    }
+
 
     public double getPotE() {
         return potE;
