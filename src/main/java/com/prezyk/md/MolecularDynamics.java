@@ -50,19 +50,20 @@ public class MolecularDynamics {
         this.getvAtoms()[1] = new double[]{-100, 0};
     }
 
-    public CompletableFuture<Molecules> calculateSimulationConcurrent() {
-        CompletableFuture<Molecules> futureMolecules = new CompletableFuture<>();
+    public CompletableFuture<Simulation> calculateSimulationConcurrent() {
+        CompletableFuture<Simulation> futureMolecules = new CompletableFuture<>();
         Runnable calculate = () -> futureMolecules.complete(calculateSimulation());
         new Thread(calculate).start();
         return futureMolecules;
     }
 
-    public Molecules calculateSimulation() {
-        Molecules molecules = new Molecules(simulationConditions.getMoleculesQuantity(),
-                                            simulationConditions.getTimeStepsAmount(),
-                                            simulationConditions.getMoleculeRadius(),
-                                            simulationConditions.getEpsilon(),
-                                            simulationConditions.getBoxSize());
+    public Simulation calculateSimulation() {
+        Simulation molecules = new Simulation(simulationConditions.getMoleculesQuantity(),
+                                              simulationConditions.getTimeStepsAmount(),
+                                              simulationConditions.getMoleculeRadius(),
+                                              simulationConditions.getEpsilon(),
+                                              simulationConditions.getBoxSize(),
+                                              simulationConditions.getMass());
         double currentTime = 0;
         for (int i = 0; i < simulationConditions.getTimeStepsAmount(); i++) {
             molecules.addRow(i, currentTime, rAtoms, vAtoms, aAtoms, kinE, potE, elastE);

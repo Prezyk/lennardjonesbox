@@ -1,12 +1,12 @@
 package com.prezyk.util;
 
-import com.prezyk.md.Molecules;
+import com.prezyk.md.Simulation;
 
 import java.io.*;
 
 public class CSVHandler {
 
-    public void save(Molecules molecules, String path) throws FileNotFoundException {
+    public void save(Simulation molecules, String path) throws FileNotFoundException {
 
         PrintWriter pw = new PrintWriter(path);
         StringBuilder sb = new StringBuilder();
@@ -97,7 +97,7 @@ public class CSVHandler {
         pw.close();
     }
 
-    public Molecules load(String path) throws IOException {
+    public Simulation load(String path) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(path));
         String line = br.readLine();
         String[] splitLine = line.split(",");
@@ -107,7 +107,8 @@ public class CSVHandler {
         double eps = Double.parseDouble(splitLine[3]);
         double boxSize = Double.parseDouble(splitLine[4]);
 
-        Molecules molecules = new Molecules(quantity, n, r, eps, boxSize);
+        //TODO mass is not in CSV, have to handle it later
+        Simulation molecules = new Simulation(quantity, n, r, eps, boxSize, -1);
         int index = 0;
         br.readLine();
 

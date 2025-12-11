@@ -1,7 +1,7 @@
 package com.prezyk.controller;
 
 import com.prezyk.event.EventDispatcher;
-import com.prezyk.md.Molecules;
+import com.prezyk.md.Simulation;
 import com.prezyk.event.SimulationCalculationsFinishedEvent;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -25,7 +25,7 @@ public class ChartsController {
         eventDispatcher.registerEventHandler(SimulationCalculationsFinishedEvent.class, this::simulationCalculationsFinishedEventHandler);
     }
 
-    private void reloadChartData(Molecules molecules) {
+    private void reloadChartData(Simulation molecules) {
         ChartMapper chartMapper = new ChartMapper(molecules);
         resetChartsIfNeeded(chartMapper);
         loadAllCharts(chartMapper);
@@ -75,7 +75,7 @@ public class ChartsController {
     }
 
     private void simulationCalculationsFinishedEventHandler(SimulationCalculationsFinishedEvent event) {
-        Molecules molecules = event.getMolecules();
+        Simulation molecules = event.getMolecules();
         Platform.runLater(() -> reloadChartData(molecules));
     }
 

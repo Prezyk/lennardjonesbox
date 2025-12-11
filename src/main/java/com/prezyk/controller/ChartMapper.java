@@ -1,6 +1,6 @@
 package com.prezyk.controller;
 
-import com.prezyk.md.Molecules;
+import com.prezyk.md.Simulation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +14,10 @@ public class ChartMapper {
     private static final String BOX_ELASTIC_ENERGY = "Elastic E";
     private static final String TOTAL_ENERGY = "Total E";
 
-    private final Molecules molecules;
+    private final Simulation molecules;
     private final Map<String, double[]> namedTimeSeries;
 
-    public ChartMapper(Molecules molecules) {
+    public ChartMapper(Simulation molecules) {
         this.molecules = molecules;
         this.namedTimeSeries = new HashMap<>();
         this.namedTimeSeries.put(KINETIC_ENERGY, molecules.getKineticEnergy());

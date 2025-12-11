@@ -3,7 +3,7 @@ package com.prezyk.controller;
 import com.prezyk.event.EventDispatcher;
 import com.prezyk.event.SimulationCalculationsFinishedEvent;
 import com.prezyk.event.SimulationConditionsConfirmedEvent;
-import com.prezyk.md.Molecules;
+import com.prezyk.md.Simulation;
 import com.prezyk.md.SimulationConditions;
 import javafx.animation.PathTransition;
 import javafx.application.Platform;
@@ -77,7 +77,7 @@ public class AnimationController {
         stop = true;
     }
 
-    private void prepareAnimationData(Molecules molecules) {
+    private void prepareAnimationData(Simulation molecules) {
         for (int i = 0; i < molecules.getN(); i++) {
             for (int a = 0; a < molecules.getMoleculesQuantity(); a++) {
 
@@ -91,7 +91,7 @@ public class AnimationController {
         }
     }
 
-    private void animateMolecules(Molecules molecules) {
+    private void animateMolecules(Simulation molecules) {
         for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
             ptr.add(createPathTransition(atoms.get(i), pathList.get(i), molecules.getDuration()));
         }
@@ -130,7 +130,7 @@ public class AnimationController {
     }
 
     private void simulationCalculationsFinishedEventHandler(SimulationCalculationsFinishedEvent event) {
-        Molecules molecules = event.getMolecules();
+        Simulation molecules = event.getMolecules();
         Platform.runLater(() -> {
             prepareAnimationData(molecules);
             ptr = new ArrayList<>();

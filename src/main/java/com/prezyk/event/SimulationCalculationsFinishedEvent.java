@@ -1,15 +1,15 @@
 package com.prezyk.event;
 
-import com.prezyk.md.Molecules;
+import com.prezyk.md.Simulation;
 
 public class SimulationCalculationsFinishedEvent implements Event {
-    private final Molecules molecules;
+    private final Simulation molecules;
 
-    public SimulationCalculationsFinishedEvent(Molecules molecules) {
+    public SimulationCalculationsFinishedEvent(Simulation molecules) {
         this.molecules = molecules;
     }
 
-    public Molecules getMolecules() {
+    public Simulation getMolecules() {
         return molecules;
     }
 }

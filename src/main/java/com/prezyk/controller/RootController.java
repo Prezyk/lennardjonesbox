@@ -4,7 +4,7 @@ import com.prezyk.event.EventDispatcher;
 import com.prezyk.event.SimulationCalculationsFinishedEvent;
 import com.prezyk.event.SimulationConditionsConfirmedEvent;
 import com.prezyk.md.MolecularDynamics;
-import com.prezyk.md.Molecules;
+import com.prezyk.md.Simulation;
 import com.prezyk.md.SimulationConditions;
 import javafx.fxml.FXML;
 import javafx.scene.layout.GridPane;
@@ -27,7 +27,7 @@ public class RootController {
 
         MolecularDynamics molecularDynamics = new MolecularDynamics(simulationConditions);
 
-        CompletableFuture<Molecules> futureSimulationResult = molecularDynamics.calculateSimulationConcurrent();
+        CompletableFuture<Simulation> futureSimulationResult = molecularDynamics.calculateSimulationConcurrent();
 
         futureSimulationResult.thenAccept(molecules -> EventDispatcher.getInstance()
                                                                       .dispatchEvent(new SimulationCalculationsFinishedEvent(molecules)));

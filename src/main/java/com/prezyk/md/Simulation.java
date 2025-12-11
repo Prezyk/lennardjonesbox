@@ -1,13 +1,13 @@
 package com.prezyk.md;
 
-public class Molecules {
+import java.util.Arrays;
+
+public class Simulation {
 
     private final int moleculesQuantity;
     private final double[] time;
     private final int n;
-    private final double[][][] rVectors;
-    private final double[][][] vVectors;
-    private final double[][][] aVectors;
+    private final Molecule[] molecules;
     private final double[] kineticEnergy;
     private final double[] potentialEnergy;
     private final double[] boxElasticEnergy;
@@ -18,54 +18,37 @@ public class Molecules {
 
 
 
-    public Molecules(int moleculesQuantity, int n, double r, double eps, double boxSize) {
+    public Simulation(int moleculesQuantity, int n, double r, double eps, double boxSize, double mass) {
         this.n = n;
         this.moleculesQuantity = moleculesQuantity;
         this.r = r;
         this.eps = eps;
         this.boxSize = boxSize;
         this.time = new double[n];
-        this.rVectors = new double[moleculesQuantity][][];
-        this.vVectors = new double[moleculesQuantity][][];
-        this.aVectors = new double[moleculesQuantity][][];
+        this.molecules = new Molecule[moleculesQuantity];
+        for (int i = 0; i < this.molecules.length; i++) {
+            this.molecules[i] = new Molecule(r, mass, n);
+        }
         this.kineticEnergy = new double[n];
         this.potentialEnergy = new double[n];
         this.boxElasticEnergy = new double[n];
         this.totalEnergy = new double[n];
-
-
-
-        for(int i=0; i<moleculesQuantity; i++) {
-            this.rVectors[i] = new double[n][2];
-            this.vVectors[i] = new double[n][2];
-            this.aVectors[i] = new double[n][2];
-        }
-
-
     }
 
     public int getMoleculesQuantity() {
         return moleculesQuantity;
     }
 
-    public void addRow(int index, double time, double[][] rVector, double[][] vVector, double[][] aVector, double kineticEnergy, double potentialEnergy, double boxElasticEnergy) {
-        this.time[index] = time;
-        this.kineticEnergy[index] = kineticEnergy;
-        this.potentialEnergy[index] = potentialEnergy;
-        this.boxElasticEnergy[index] = boxElasticEnergy;
-        this.totalEnergy[index] = kineticEnergy + potentialEnergy + boxElasticEnergy;
+    public void addRow(int timePoint, double time, double[][] rVector, double[][] vVector, double[][] aVector, double kineticEnergy, double potentialEnergy, double boxElasticEnergy) {
+        this.time[timePoint] = time;
+        this.kineticEnergy[timePoint] = kineticEnergy;
+        this.potentialEnergy[timePoint] = potentialEnergy;
+        this.boxElasticEnergy[timePoint] = boxElasticEnergy;
+        this.totalEnergy[timePoint] = kineticEnergy + potentialEnergy + boxElasticEnergy;
         for(int i=0; i<this.moleculesQuantity; i++) {
-            this.rVectors[i][index] = new double[2];
-            this.rVectors[i][index][0] = rVector[i][0];
-            this.rVectors[i][index][1] = rVector[i][1];
-
-            this.aVectors[i][index] = new double[2];
-            this.aVectors[i][index][0] = aVector[i][0];
-            this.aVectors[i][index][1] = aVector[i][1];
-
-            this.vVectors[i][index] = new double[2];
-            this.vVectors[i][index][0] = vVector[i][0];
-            this.vVectors[i][index][1] = vVector[i][1];
+            this.molecules[i].setPositionVector(rVector[i], timePoint);
+            this.molecules[i].setVelocityVector(vVector[i], timePoint);
+            this.molecules[i].setAccelerationVector(aVector[i], timePoint);
         }
     }
 
@@ -82,15 +65,21 @@ public class Molecules {
     }
 
     public double[][][] getrVectors() {
-        return rVectors;
+        return Arrays.stream(this.molecules)
+              .map(Molecule::getPositionVectors)
+                                    .toArray(double[][][]::new);
     }
 
     public double[][][] getvVectors() {
-        return vVectors;
+        return Arrays.stream(this.molecules)
+                                    .map(Molecule::getVelocityVectors)
+                                    .toArray(double[][][]::new);
     }
 
     public double[][][] getaVectors() {
-        return aVectors;
+        return Arrays.stream(this.molecules)
+                                    .map(Molecule::getAccelerationVectors)
+                                    .toArray(double[][][]::new);
     }
 
     public double[] getKineticEnergy() {
