@@ -63,7 +63,8 @@ public class MolecularDynamics {
                                               simulationConditions.getMoleculeRadius(),
                                               simulationConditions.getEpsilon(),
                                               simulationConditions.getBoxSize(),
-                                              simulationConditions.getMass());
+                                              simulationConditions.getMass(),
+                                              simulationConditions.getWallStiffness());
         double currentTime = 0;
         for (int i = 0; i < simulationConditions.getTimeStepsAmount(); i++) {
             molecules.addRow(i, currentTime, rAtoms, vAtoms, aAtoms, kinE, potE, elastE);

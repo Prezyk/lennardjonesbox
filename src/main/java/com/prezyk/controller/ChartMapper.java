@@ -15,22 +15,22 @@ public class ChartMapper {
     private static final String TOTAL_ENERGY = "Total E";
 
     private final Simulation molecules;
-    private final Map<String, double[]> namedTimeSeries;
+    private final Map<String, Double[]> namedTimeSeries;
 
     public ChartMapper(Simulation molecules) {
         this.molecules = molecules;
         this.namedTimeSeries = new HashMap<>();
-        this.namedTimeSeries.put(KINETIC_ENERGY, molecules.getKineticEnergy());
-        this.namedTimeSeries.put(POTENTIAL_ENERGY, molecules.getPotentialEnergy());
-        this.namedTimeSeries.put(BOX_ELASTIC_ENERGY, molecules.getBoxElasticEnergy());
-        this.namedTimeSeries.put(TOTAL_ENERGY, molecules.getTotalEnergy());
+        this.namedTimeSeries.put(KINETIC_ENERGY, molecules.getKineticEnergySeries());
+        this.namedTimeSeries.put(POTENTIAL_ENERGY, molecules.getPotentialEnergySeries());
+        this.namedTimeSeries.put(BOX_ELASTIC_ENERGY, molecules.getBoxElasticEnergySeries());
+        this.namedTimeSeries.put(TOTAL_ENERGY, molecules.getTotalEnergySeries());
     }
 
     public double[] getTimePoints() {
         return molecules.getTime();
     }
 
-    public double[] getTimeSeries(String timeSeriesName) {
+    public Double[] getTimeSeries(String timeSeriesName) {
         return namedTimeSeries.get(timeSeriesName);
     }
 

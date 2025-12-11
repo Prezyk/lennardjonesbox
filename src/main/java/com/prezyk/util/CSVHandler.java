@@ -62,11 +62,11 @@ public class CSVHandler {
 
             sb.append(molecules.getTime()[i])
               .append(",")
-              .append(molecules.getKineticEnergy()[i])
+              .append(molecules.getKineticEnergySeries()[i])
               .append(",")
-              .append(molecules.getPotentialEnergy()[i])
+              .append(molecules.getPotentialEnergySeries()[i])
               .append(",")
-              .append(molecules.getBoxElasticEnergy()[i])
+              .append(molecules.getBoxElasticEnergySeries()[i])
               .append(",");
 
             for(int j=0; j<quantity; j++) {
@@ -107,8 +107,8 @@ public class CSVHandler {
         double eps = Double.parseDouble(splitLine[3]);
         double boxSize = Double.parseDouble(splitLine[4]);
 
-        //TODO mass is not in CSV, have to handle it later
-        Simulation molecules = new Simulation(quantity, n, r, eps, boxSize, -1);
+        //TODO mass and wallStiffness is not in CSV, have to handle it later
+        Simulation molecules = new Simulation(quantity, n, r, eps, boxSize, -1, -1);
         int index = 0;
         br.readLine();
 

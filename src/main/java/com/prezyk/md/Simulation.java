@@ -8,31 +8,23 @@ public class Simulation {
     private final double[] time;
     private final int n;
     private final Molecule[] molecules;
-    private final double[] kineticEnergy;
-    private final double[] potentialEnergy;
-    private final double[] boxElasticEnergy;
-    private final double[] totalEnergy;
+    private final Box box;
     private final double r;
     private final double eps;
-    private final double boxSize;
 
 
 
-    public Simulation(int moleculesQuantity, int n, double r, double eps, double boxSize, double mass) {
+    public Simulation(int moleculesQuantity, int n, double r, double eps, double boxSize, double mass, double wallStiffness) {
         this.n = n;
         this.moleculesQuantity = moleculesQuantity;
         this.r = r;
         this.eps = eps;
-        this.boxSize = boxSize;
         this.time = new double[n];
+        this.box = new Box(boxSize, wallStiffness, n);
         this.molecules = new Molecule[moleculesQuantity];
         for (int i = 0; i < this.molecules.length; i++) {
             this.molecules[i] = new Molecule(r, mass, n);
         }
-        this.kineticEnergy = new double[n];
-        this.potentialEnergy = new double[n];
-        this.boxElasticEnergy = new double[n];
-        this.totalEnergy = new double[n];
     }
 
     public int getMoleculesQuantity() {
@@ -41,10 +33,7 @@ public class Simulation {
 
     public void addRow(int timePoint, double time, double[][] rVector, double[][] vVector, double[][] aVector, double kineticEnergy, double potentialEnergy, double boxElasticEnergy) {
         this.time[timePoint] = time;
-        this.kineticEnergy[timePoint] = kineticEnergy;
-        this.potentialEnergy[timePoint] = potentialEnergy;
-        this.boxElasticEnergy[timePoint] = boxElasticEnergy;
-        this.totalEnergy[timePoint] = kineticEnergy + potentialEnergy + boxElasticEnergy;
+        this.box.setState(timePoint, new BoxState(kineticEnergy, boxElasticEnergy, potentialEnergy));
         for(int i=0; i<this.moleculesQuantity; i++) {
             this.molecules[i].setState(timePoint, new MoleculeState(rVector[i], vVector[i], aVector[i]));
         }
@@ -64,32 +53,32 @@ public class Simulation {
 
     public double[][][] getrVectors() {
         return Arrays.stream(this.molecules)
-                                 .map(Molecule::getPositionVectors)
+                                 .map(Molecule::getPositionVectorSeries)
                                  .toArray(double[][][]::new);
     }
 
     public double[][][] getvVectors() {
         return Arrays.stream(this.molecules)
-                                 .map(Molecule::getVelocityVectors)
+                                 .map(Molecule::getVelocityVectorSeries)
                                  .toArray(double[][][]::new);
     }
 
     public double[][][] getaVectors() {
         return Arrays.stream(this.molecules)
-                                 .map(Molecule::getAccelerationVectors)
+                                 .map(Molecule::getAccelerationVectorSeries)
                                  .toArray(double[][][]::new);
     }
 
-    public double[] getKineticEnergy() {
-        return kineticEnergy;
+    public Double[] getKineticEnergySeries() {
+        return this.box.getKineticEnergySeries();
     }
 
-    public double[] getPotentialEnergy() {
-        return potentialEnergy;
+    public Double[] getPotentialEnergySeries() {
+        return this.box.getPotentialEnergySeries();
     }
 
-    public double[] getBoxElasticEnergy() {
-        return boxElasticEnergy;
+    public Double[] getBoxElasticEnergySeries() {
+        return this.box.getElasticEnergySeries();
     }
 
     public double getR() {
@@ -101,10 +90,10 @@ public class Simulation {
     }
 
     public double getBoxSize() {
-        return boxSize;
+        return this.box.getSize();
     }
 
-    public double[] getTotalEnergy() {
-        return totalEnergy;
+    public Double[] getTotalEnergySeries() {
+        return this.box.getTotalEnergySeries();
     }
 }

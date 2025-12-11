@@ -31,19 +31,19 @@ public class Molecule {
         return Objects.hash(id, radius, mass, Arrays.hashCode(moleculeTimeStates));
     }
 
-    public double[][] getPositionVectors() {
+    public double[][] getPositionVectorSeries() {
         return Arrays.stream(moleculeTimeStates)
                      .map(MoleculeState::getPositionVector)
                      .toArray(double[][]::new);
     }
 
-    public double[][] getVelocityVectors() {
+    public double[][] getVelocityVectorSeries() {
         return Arrays.stream(moleculeTimeStates)
                      .map(MoleculeState::getVelocityVector)
                      .toArray(double[][]::new);
     }
 
-    public double[][] getAccelerationVectors() {
+    public double[][] getAccelerationVectorSeries() {
         return Arrays.stream(moleculeTimeStates)
                      .map(MoleculeState::getAccelerationVector)
                      .toArray(double[][]::new);

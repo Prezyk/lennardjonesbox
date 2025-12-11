@@ -61,7 +61,7 @@ public class ChartsController {
              .forEach(series -> loadChart(series, chartMapper.getTimeSeries(series.getName()), chartMapper.getTimePoints()));
     }
 
-    private void loadChart(XYChart.Series<Number, Number> series, double[] timeSeries, double[] timePoints) {
+    private void loadChart(XYChart.Series<Number, Number> series, Double[] timeSeries, double[] timePoints) {
         series.getData()
               .clear();
 

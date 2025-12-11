@@ -77,12 +77,12 @@ public class AnimationController {
         stop = true;
     }
 
-    private void prepareAnimationData(Simulation molecules) {
-        for (int i = 0; i < molecules.getN(); i++) {
-            for (int a = 0; a < molecules.getMoleculesQuantity(); a++) {
+    private void prepareAnimationData(Simulation simulation) {
+        for (int i = 0; i < simulation.getN(); i++) {
+            for (int a = 0; a < simulation.getMoleculesQuantity(); a++) {
 
-                double xCoord = molecules.getrVectors()[a][i][0] * animationPane.getWidth() / molecules.getBoxSize();
-                double yCoord = animationPane.getHeight() - molecules.getrVectors()[a][i][1] * animationPane.getHeight() / molecules.getBoxSize();
+                double xCoord = simulation.getrVectors()[a][i][0] * animationPane.getWidth() / simulation.getBoxSize();
+                double yCoord = animationPane.getHeight() - simulation.getrVectors()[a][i][1] * animationPane.getHeight() / simulation.getBoxSize();
                 pathList.get(a)
                         .getElements()
                         .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
