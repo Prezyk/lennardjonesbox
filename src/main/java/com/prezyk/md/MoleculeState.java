@@ -7,46 +7,12 @@ public class MoleculeState {
     private final double[] velocityVector;
     private final double[] accelerationVector;
 
-    private MoleculeState(double[] positionVector,
-                          double[] velocityVector,
-                          double[] accelerationVector) {
-        this.positionVector = positionVector;
-        this.velocityVector = velocityVector;
-        this.accelerationVector = accelerationVector;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private final double[] positionVector = new double[2];
-        private final double[] velocityVector = new double[2];
-        private final double[] accelerationVector = new double[2];
-
-
-        private Builder() {}
-
-        public Builder positionVector(double[] positionVector) {
-            copyVector(this.positionVector, positionVector);
-            return this;
-        }
-
-        public Builder velocityVector(double[] velocityVector) {
-            copyVector(this.velocityVector, velocityVector);
-            return this;
-        }
-
-        public Builder accelerationVector(double[] accelerationVector) {
-            copyVector(this.accelerationVector, accelerationVector);
-            return this;
-        }
-
-        public MoleculeState build() {
-            return new MoleculeState(this.positionVector,
-                                     this.velocityVector,
-                                     this.accelerationVector);
-        }
+    public MoleculeState(double[] positionVector,
+                         double[] velocityVector,
+                         double[] accelerationVector) {
+        this.positionVector = copyVector(positionVector);
+        this.velocityVector = copyVector(velocityVector);
+        this.accelerationVector = copyVector(accelerationVector);
     }
 
     public double[] getPositionVector() {

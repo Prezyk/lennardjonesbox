@@ -46,12 +46,7 @@ public class Simulation {
         this.boxElasticEnergy[timePoint] = boxElasticEnergy;
         this.totalEnergy[timePoint] = kineticEnergy + potentialEnergy + boxElasticEnergy;
         for(int i=0; i<this.moleculesQuantity; i++) {
-            MoleculeState moleculeState = MoleculeState.builder()
-                                                       .positionVector(rVector[i])
-                                                       .velocityVector(vVector[i])
-                                                       .accelerationVector(aVector[i])
-                                                       .build();
-            this.molecules[i].setState(timePoint, moleculeState);
+            this.molecules[i].setState(timePoint, new MoleculeState(rVector[i], vVector[i], aVector[i]));
         }
     }
 
