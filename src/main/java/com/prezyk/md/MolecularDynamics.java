@@ -18,7 +18,6 @@ public class MolecularDynamics {
     private final MoleculeState[] currentMoleculesStates;
 
     public MolecularDynamics(SimulationInput simulationInput) {
-        super();
         this.simulationInput = simulationInput;
         this.setPotE(0);
         this.setKinE(0);
@@ -40,16 +39,15 @@ public class MolecularDynamics {
     }
 
     public Simulation calculateSimulation() {
-        Simulation molecules = new Simulation(simulationInput);
         double currentTime = 0;
         for (int i = 0; i < simulationInput.getTimeStepsAmount(); i++) {
-            molecules.setState(i, currentTime, new BoxState(getKinE(), getElastE(), getPotE()), Arrays.stream(currentMoleculesStates)
+            simulation.setState(i, currentTime, new BoxState(getKinE(), getElastE(), getPotE()), Arrays.stream(currentMoleculesStates)
                                                                                                       .map(MoleculeState::clone)
                                                                                                       .toArray(MoleculeState[]::new));
             verletStep();
             currentTime += simulationInput.getTimeStep();
         }
-        return molecules;
+        return simulation;
     }
 
     private void calculateMoleculesAcceleration() {
@@ -58,7 +56,7 @@ public class MolecularDynamics {
             currentMoleculesState.getAccelerationVector()[1] = 0;
         }
 
-        double rij2;
+        double moleculesDistance;
         double rij;
         double dx;
         double dy;
@@ -72,12 +70,12 @@ public class MolecularDynamics {
 
                 dx = currentMoleculesStates[i].getPositionVector()[0] - currentMoleculesStates[j].getPositionVector()[0];
                 dy = currentMoleculesStates[i].getPositionVector()[1] - currentMoleculesStates[j].getPositionVector()[1];
-                rij2 = dx*dx + dy*dy;
-                rij = Math.sqrt(rij2);
+                moleculesDistance = dx*dx + dy*dy;
+                rij = Math.sqrt(moleculesDistance);
                 fr6 = Math.pow(simulationInput.getMoleculeRadius() /rij, 6);
 
-                if(rij2 < calcRcut2(simulationInput)) {
-                    fr = -(48 * simulationInput.getEpsilon() /rij2) * fr6 * (fr6 * - 0.5) / simulationInput.getMass();
+                if(moleculesDistance < influenceThresholdDistance()) {
+                    fr = -(48 * simulationInput.getEpsilon() / moleculesDistance) * fr6 * (fr6 * - 0.5) / simulationInput.getMass();
                     fx = fr*dx;
                     fy = fr*dy;
 
@@ -134,7 +132,7 @@ public class MolecularDynamics {
         return currentMoleculesStates[moleculeIndex].getPositionVector()[coordinate] > (simulationInput.getBoxSize() - ELASTIC_INFLUENCE_THRESHOLD);
     }
 
-    private double calcRcut2(SimulationInput simulationInput) {
+    private double influenceThresholdDistance() {
         return Math.pow(2 * simulationInput.getMoleculeRadius(), 2);
     }
 
