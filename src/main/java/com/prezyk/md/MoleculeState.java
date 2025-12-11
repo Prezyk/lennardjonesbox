@@ -26,4 +26,8 @@ public class MoleculeState {
     public double[] getAccelerationVector() {
         return accelerationVector;
     }
+
+    public MoleculeState clone() {
+        return new MoleculeState(positionVector, velocityVector, accelerationVector);
+    }
 }

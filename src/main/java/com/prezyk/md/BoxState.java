@@ -26,4 +26,8 @@ public class BoxState {
     public double getTotalEnergy() {
         return kineticEnergy + elasticEnergy + potentialEnergy;
     }
+
+    public BoxState clone() {
+        return new BoxState(kineticEnergy, elasticEnergy, potentialEnergy);
+    }
 }

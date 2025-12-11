@@ -1,53 +1,35 @@
 package com.prezyk.md;
 
-import java.util.Random;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 public class MolecularDynamics {
-
-    private int nAtoms;
-    private double[][] rAtoms;
-    private double[][] vAtoms;
-    private double[][] aAtoms;
 
     private double potE;
     private double kinE;
     private double elastE;
 
     private double rCut2;
-    private final SimulationInput simulationConditions;
+    private final SimulationInput simulationInput;
+    private final Simulation simulation;
+    private final MoleculeState[] currentMoleculesStates;
 
-    public MolecularDynamics(SimulationInput simulationConditions) {
+    public MolecularDynamics(SimulationInput simulationInput) {
         super();
-        Random gen = new Random();
-        this.simulationConditions = simulationConditions;
-        this.setnAtoms(simulationConditions.getMoleculesQuantity());
-        this.setrAtoms(new double[this.getnAtoms()][2]);
-        this.setvAtoms(new double[this.getnAtoms()][2]);
-        this.setaAtoms(new double[this.getnAtoms()][2]);
-        this.setrCut2(Math.pow(2 * simulationConditions.getMoleculeRadius(), 2));
+        this.simulationInput = simulationInput;
+
+        this.setrCut2(Math.pow(2 * simulationInput.getMoleculeRadius(), 2));
         this.setPotE(0);
         this.setKinE(0);
-        for (int i = 0; i< this.getnAtoms(); i++) {
+        simulation = new Simulation(simulationInput);
+        InitialConditionsGenerator initialConditionsGenerator = new InitialConditionsGenerator(simulationInput);
+        currentMoleculesStates = initialConditionsGenerator.generateInitialConditions();
 
-            this.getrAtoms()[i] = new double[]{Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius()), Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius())};
-
-            for(int j=0; j<(i+1); j++) {
-                if ((i!=j)&& ((Math.pow(getrAtoms()[i][0]- getrAtoms()[j][0],2) + Math.pow(getrAtoms()[i][1]- getrAtoms()[j][1],2)) <= (simulationConditions.getMoleculeRadius() * simulationConditions.getMoleculeRadius()))) {
-                    this.getrAtoms()[i] = new double[]{Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius()), Math.abs(gen.nextDouble()* simulationConditions.getBoxSize() - simulationConditions.getMoleculeRadius())};
-                    j = 0;
-                }
-            }
-
-            getvAtoms()[i] = new double[]{gen.nextGaussian()*10, gen.nextGaussian()*10};
-            calculateAcc();
-            kinECacl();
-        }
-
-        this.getrAtoms()[0] = new double[]{50, 350};
-        this.getrAtoms()[1] = new double[]{300, 350};
-        this.getvAtoms()[0] = new double[]{100, 0};
-        this.getvAtoms()[1] = new double[]{-100, 0};
+        calculateAcc();
+        kinECacl();
+        simulation.setState(0, 0, new BoxState(getKinE(), getElastE(), getPotE()), Arrays.stream(currentMoleculesStates)
+                                                                                                           .map(MoleculeState::clone)
+                                                                                                           .toArray(MoleculeState[]::new));
     }
 
     public CompletableFuture<Simulation> calculateSimulationConcurrent() {
@@ -58,26 +40,23 @@ public class MolecularDynamics {
     }
 
     public Simulation calculateSimulation() {
-        Simulation molecules = new Simulation(simulationConditions.getMoleculesQuantity(),
-                                              simulationConditions.getTimeStepsAmount(),
-                                              simulationConditions.getMoleculeRadius(),
-                                              simulationConditions.getEpsilon(),
-                                              simulationConditions.getBoxSize(),
-                                              simulationConditions.getMass(),
-                                              simulationConditions.getWallStiffness());
+        Simulation molecules = new Simulation(simulationInput);
         double currentTime = 0;
-        for (int i = 0; i < simulationConditions.getTimeStepsAmount(); i++) {
-            molecules.addRow(i, currentTime, rAtoms, vAtoms, aAtoms, kinE, potE, elastE);
-            verletStep(simulationConditions.getTimeStep());
-            currentTime += simulationConditions.getTimeStep();
+        for (int i = 0; i < simulationInput.getTimeStepsAmount(); i++) {
+            molecules.setState(i, currentTime, new BoxState(getKinE(), getElastE(), getPotE()), Arrays.stream(currentMoleculesStates)
+                                                                                                      .map(MoleculeState::clone)
+                                                                                                      .toArray(MoleculeState[]::new));
+            verletStep();
+            currentTime += simulationInput.getTimeStep();
         }
         return molecules;
     }
 
     private void calculateAcc() {
 
-        for(int i=0; i<getnAtoms(); i++) {
-            setaAtom(i, new double[]{0, 0});
+        for(int i=0; i< currentMoleculesStates.length; i++) {
+            currentMoleculesStates[i].getAccelerationVector()[0] = 0;
+            currentMoleculesStates[i].getAccelerationVector()[1] = 0;
         }
 
         double rij2;
@@ -89,119 +68,86 @@ public class MolecularDynamics {
         double fx;
         double fy;
         setPotE(0);
-        for(int i = 0; i< getnAtoms(); i++) {
-            for(int j = i+1; j< getnAtoms(); j++) {
+        for(int i = 0; i < currentMoleculesStates.length; i++) {
+            for(int j = i + 1; j < currentMoleculesStates.length; j++) {
 
-                dx = getrAtoms()[i][0]- getrAtoms()[j][0];
-                dy = getrAtoms()[i][1]- getrAtoms()[j][1];
+                dx = currentMoleculesStates[i].getPositionVector()[0] - currentMoleculesStates[j].getPositionVector()[0];
+                dy = currentMoleculesStates[i].getPositionVector()[1] - currentMoleculesStates[j].getPositionVector()[1];
                 rij2 = dx*dx + dy*dy;
                 rij = Math.sqrt(rij2);
-                fr6 = Math.pow(simulationConditions.getMoleculeRadius() /rij, 6);
+                fr6 = Math.pow(simulationInput.getMoleculeRadius() /rij, 6);
 
-                if(rij2< getrCut2()) {
-                    fr = -(48 * simulationConditions.getEpsilon() /rij2) * fr6 * (fr6 * - 0.5) / simulationConditions.getMass();
+                if(rij2 < calcRcut2(simulationInput)) {
+                    fr = -(48 * simulationInput.getEpsilon() /rij2) * fr6 * (fr6 * - 0.5) / simulationInput.getMass();
                     fx = fr*dx;
                     fy = fr*dy;
 
-                    getaAtoms()[i][0] += fx;
-                    getaAtoms()[j][0] -= fx;
-                    getaAtoms()[i][1] += fy;
-                    getaAtoms()[j][1] -= fy;
+                    currentMoleculesStates[i].getAccelerationVector()[0] += fx;
+                    currentMoleculesStates[j].getAccelerationVector()[0] -= fx;
+                    currentMoleculesStates[i].getAccelerationVector()[1] += fy;
+                    currentMoleculesStates[j].getAccelerationVector()[1] -= fy;
 
-                    setPotE(getPotE() + 2 * simulationConditions.getEpsilon() * fr6 * (fr6 - 1.0));
+                    setPotE(getPotE() + 2 * simulationInput.getEpsilon() * fr6 * (fr6 - 1.0));
                 }
             }
         }
 
         setElastE(0);
-        for(int i=0; i<nAtoms; i++) {
+        for(int i=0; i < simulationInput.getMoleculesQuantity(); i++) {
             double d;
-            if(rAtoms[i][0] < 0.5) {
-                d = 0.5 - rAtoms[i][0];
-                aAtoms[i][0] += simulationConditions.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
+            if(currentMoleculesStates[i].getPositionVector()[0] < 0.5) {
+                d = 0.5 - currentMoleculesStates[i].getPositionVector()[0];
+                currentMoleculesStates[i].getAccelerationVector()[0] += simulationInput.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
 
-            if(rAtoms[i][0] > (simulationConditions.getBoxSize()-0.5)) {
-                d = simulationConditions.getBoxSize() - 0.5 - rAtoms[i][0];
-                aAtoms[i][0] += simulationConditions.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
+            if(currentMoleculesStates[i].getPositionVector()[0] > (simulationInput.getBoxSize()-0.5)) {
+                d = simulationInput.getBoxSize() - 0.5 - currentMoleculesStates[i].getPositionVector()[0];
+                currentMoleculesStates[i].getAccelerationVector()[0] += simulationInput.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
 
-            if(rAtoms[i][1] < 0.5) {
-                d = 0.5 - rAtoms[i][1];
-                aAtoms[i][1] += simulationConditions.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
+            if(currentMoleculesStates[i].getPositionVector()[1] < 0.5) {
+                d = 0.5 - currentMoleculesStates[i].getPositionVector()[1];
+                currentMoleculesStates[i].getAccelerationVector()[1] += simulationInput.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
 
-            if(rAtoms[i][1] > (simulationConditions.getBoxSize() - 0.5)) {
-                d = simulationConditions.getBoxSize() - 0.5 - rAtoms[i][1];
-                aAtoms[i][1] += simulationConditions.getWallStiffness() * d;
-                setElastE(getElastE() + 0.5 * simulationConditions.getWallStiffness() * d * d * simulationConditions.getMass());
+            if(currentMoleculesStates[i].getPositionVector()[1] > (simulationInput.getBoxSize() - 0.5)) {
+                d = simulationInput.getBoxSize() - 0.5 - currentMoleculesStates[i].getPositionVector()[1];
+                currentMoleculesStates[i].getAccelerationVector()[1] += simulationInput.getWallStiffness() * d;
+                setElastE(getElastE() + 0.5 * simulationInput.getWallStiffness() * d * d * simulationInput.getMass());
             }
         }
+    }
+
+    private double calcRcut2(SimulationInput simulationInput) {
+        return Math.pow(2 * simulationInput.getMoleculeRadius(), 2);
     }
 
 
     private void kinECacl() {
         setKinE(0);
-        for(int i = 0; i< getnAtoms(); i++) {
-            setKinE(getKinE() + simulationConditions.getMass() *(Math.pow(getvAtoms()[i][0],2) + Math.pow(getvAtoms()[i][1],2))/2);
+        for(int i = 0; i< currentMoleculesStates.length; i++) {
+            setKinE(getKinE() + simulationInput.getMass() *(Math.pow(currentMoleculesStates[i].getVelocityVector()[0], 2) + Math.pow(currentMoleculesStates[i].getVelocityVector()[1], 2))/2);
         }
     }
 
-    private void verletStep(double dt) {
-        double[][] tempVAtoms = new double[getnAtoms()][2];
-        for(int i = 0; i< getnAtoms(); i++) {
-            tempVAtoms[i][0] = getvAtoms()[i][0] + dt* getaAtoms()[i][0]/2;
-            tempVAtoms[i][1] = getvAtoms()[i][1] + dt* getaAtoms()[i][1]/2;
+    private void verletStep() {
+        double[][] tempVAtoms = new double[currentMoleculesStates.length][2];
+        for(int i = 0; i < currentMoleculesStates.length; i++) {
+            tempVAtoms[i][0] = currentMoleculesStates[i].getVelocityVector()[0] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[0]/2;
+            tempVAtoms[i][1] = currentMoleculesStates[i].getVelocityVector()[1] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[1]/2;
 
-            getrAtoms()[i][0] += dt*tempVAtoms[i][0];
-            getrAtoms()[i][1] += dt*tempVAtoms[i][1];
+            currentMoleculesStates[i].getPositionVector()[0] += simulationInput.getTimeStep() * tempVAtoms[i][0];
+            currentMoleculesStates[i].getPositionVector()[1] += simulationInput.getTimeStep() * tempVAtoms[i][1];
         }
         calculateAcc();
-        for(int i = 0; i< getnAtoms(); i++) {
-            getvAtoms()[i][0] = tempVAtoms[i][0] + dt* getaAtoms()[i][0]/2;
-            getvAtoms()[i][1] = tempVAtoms[i][1] + dt* getaAtoms()[i][1]/2;
+        for(int i = 0; i < currentMoleculesStates.length; i++) {
+            currentMoleculesStates[i].getVelocityVector()[0] = tempVAtoms[i][0] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[0]/2;
+            currentMoleculesStates[i].getVelocityVector()[1] = tempVAtoms[i][1] + simulationInput.getTimeStep() * currentMoleculesStates[i].getAccelerationVector()[1]/2;
         }
         kinECacl();
-    }
-
-
-    public void setaAtom(int i, double[] acc) {
-        this.aAtoms[i] = acc;
-    }
-
-    public int getnAtoms() {
-        return nAtoms;
-    }
-
-    public void setnAtoms(int nAtoms) {
-        this.nAtoms = nAtoms;
-    }
-
-    public double[][] getrAtoms() {
-        return rAtoms;
-    }
-
-    public void setrAtoms(double[][] rAtoms) {
-        this.rAtoms = rAtoms;
-    }
-
-    public double[][] getvAtoms() {
-        return vAtoms;
-    }
-
-    public void setvAtoms(double[][] vAtoms) {
-        this.vAtoms = vAtoms;
-    }
-
-    public double[][] getaAtoms() {
-        return aAtoms;
-    }
-
-    public void setaAtoms(double[][] aAtoms) {
-        this.aAtoms = aAtoms;
     }
 
     public double getPotE() {

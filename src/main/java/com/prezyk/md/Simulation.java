@@ -9,13 +9,13 @@ public class Simulation {
     private final Box box;
     private final double epsilon;
 
-    public Simulation(int moleculesQuantity, int timePoints, double moleculeRadius, double epsilon, double boxSize, double mass, double wallStiffness) {
-        this.epsilon = epsilon;
-        this.time = new double[timePoints];
-        this.box = new Box(boxSize, wallStiffness, timePoints);
-        this.molecules = new Molecule[moleculesQuantity];
+    public Simulation(SimulationInput simulationInput) {
+        this.epsilon = simulationInput.getEpsilon();
+        this.time = new double[simulationInput.getTimeStepsAmount()];
+        this.box = new Box(simulationInput.getBoxSize(), simulationInput.getWallStiffness(), simulationInput.getTimeStepsAmount());
+        this.molecules = new Molecule[simulationInput.getMoleculesQuantity()];
         for (int i = 0; i < this.molecules.length; i++) {
-            this.molecules[i] = new Molecule(moleculeRadius, mass, timePoints);
+            this.molecules[i] = new Molecule(simulationInput.getMoleculeRadius(), simulationInput.getMass(), simulationInput.getTimeStepsAmount());
         }
     }
 
@@ -23,11 +23,15 @@ public class Simulation {
         return molecules.length;
     }
 
-    public void addRow(int timePoint, double time, double[][] rVector, double[][] vVector, double[][] aVector, double kineticEnergy, double potentialEnergy, double boxElasticEnergy) {
+    public void setState(int timePoint, double time, BoxState boxState, MoleculeState[] moleculesStates) {
         this.time[timePoint] = time;
-        this.box.setState(timePoint, new BoxState(kineticEnergy, boxElasticEnergy, potentialEnergy));
-        for(int i=0; i<this.getMoleculesQuantity(); i++) {
-            this.molecules[i].setState(timePoint, new MoleculeState(rVector[i], vVector[i], aVector[i]));
+        this.box.setState(timePoint, boxState);
+        this.setMoleculesStates(timePoint, moleculesStates);
+    }
+
+    private void setMoleculesStates(int timePoint, MoleculeState[] moleculesStates) {
+        for (int i = 0; i < this.molecules.length; i++) {
+            this.molecules[i].setState(timePoint, moleculesStates[i]);
         }
     }
 
