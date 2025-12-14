@@ -6,7 +6,7 @@
       prefWidth="800"
       prefHeight="800"
       styleClass="animation-pane" >
-    <ScatterChart fx:id="chart" prefHeight="600" prefWidth="600">
+    <ScatterChart fx:id="chart" prefHeight="700" prefWidth="700" legendSide="TOP">
         <xAxis>
             <NumberAxis/>
         </xAxis>

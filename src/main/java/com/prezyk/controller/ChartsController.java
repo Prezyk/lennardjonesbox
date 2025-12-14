@@ -37,6 +37,8 @@ public class ChartsController {
                                               .stream()
                                               .map(XYChart.Series::getName)
                                               .collect(Collectors.toList());
+        chart.setLegendVisible(true);
+
         if (chartMapper.getNames()
                        .size() != currentChartNames.size() || !chartMapper.getNames()
                                                                           .containsAll(currentChartNames)) {

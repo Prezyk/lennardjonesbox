@@ -24,4 +24,10 @@ public class VectorSizeException extends RuntimeException {
                                                      leftMatrixLength,
                                                      rightMatrixLength));
     }
+
+    public static VectorSizeException vectorSizeInvalid(int actualVectorSize, int requiredVectorSize) {
+        return new VectorSizeException(String.format("Vector should be of size %d, but was %d",
+                                                     requiredVectorSize,
+                                                     actualVectorSize));
+    }
 }

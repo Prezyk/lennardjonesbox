@@ -1,0 +1,93 @@
+package com.prezyk.md;
+
+import static com.prezyk.util.VectorUtil.*;
+
+public class LennardJonesModel {
+
+    public static double[][] calculateCurrentAcceleration(double[][] currentPositions,
+                                                   double epsilon,
+                                                   double mass,
+                                                   double sigma) {
+        double[][] accelerationMatrix = new double[currentPositions.length][];
+        for (int i = 0; i < currentPositions.length; i++) {
+            double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, currentPositions);
+            double[][] moleculeForces = calculateForcesForMolecule(relativeMoleculeDistances,
+                                                                   epsilon,
+                                                                   sigma);
+            double[] resultantForce = calculateResultantForceForMolecule(moleculeForces);
+            accelerationMatrix[i] = divideVector(resultantForce, mass);
+        }
+        return accelerationMatrix;
+    }
+
+    public static double calculatePotentialEnergy(double[][] currentPositions, double epsilon, double sigma) {
+        double potentialEnergy = 0;
+        for (int i = 0; i < currentPositions.length; i++) {
+            double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, currentPositions);
+            potentialEnergy += calculateEnergyForMolecule(relativeMoleculeDistances,
+                                                                   epsilon,
+                                                                   sigma);
+        }
+        return potentialEnergy;
+    }
+
+    private static double[][] calculateMoleculeDistances(int moleculeIndex, double[][] moleculesPositions) {
+        double[][] otherMoleculesPositions = removeVectorFromMatrix(moleculesPositions, moleculeIndex);
+        return subtractVectorFromMatrix(otherMoleculesPositions, moleculesPositions[moleculeIndex]);
+    }
+
+    private static double[] calculateResultantForceForMolecule(double[][] moleculeForceMatrix) {
+        return sumMatrixVectors(moleculeForceMatrix);
+    }
+
+    private static double[][] calculateForcesForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules,
+                                            double epsilon,
+                                            double sigma) {
+        return multiplyMatrix(
+                subtractMatrices(
+                        multiplyMatrix(
+                                divideScalarByMatrix(
+                                        1,
+                                        matrixPowerScalar(moleculeDistanceMatrixFromOtherMolecules, 13)
+                                ),
+                                2 * Math.pow(sigma, 12)
+                        ),
+                        multiplyMatrix(
+                                divideScalarByMatrix(
+                                        1,
+                                        matrixPowerScalar(moleculeDistanceMatrixFromOtherMolecules, 7)
+                                ),
+                                Math.pow(sigma, 6)
+                        )
+                ),
+                (-24) * epsilon
+        );
+    }
+
+    private static double calculateEnergyForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules,
+                                                     double epsilon,
+                                                     double sigma) {
+        double[] scalarDistanceVector = matrixVectorLengths(moleculeDistanceMatrixFromOtherMolecules);
+        return sumVectorElements(
+                multiplyVector(
+                        subtractVectors(
+                                multiplyVector(
+                                        divideScalarByVector(
+                                                1,
+                                                vectorPowerScalar(scalarDistanceVector, 12)
+                                        ),
+                                        2 * Math.pow(sigma, 12)
+                                ),
+                                multiplyVector(
+                                        divideScalarByVector(
+                                                1,
+                                                vectorPowerScalar(scalarDistanceVector, 6)
+                                        ),
+                                        Math.pow(sigma, 6)
+                                )
+                        ),
+                        4 * epsilon
+                )
+        );
+    }
+}
