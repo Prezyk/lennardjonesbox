@@ -106,6 +106,11 @@ public class VectorUtil {
         return operateOnMatrixAndVector(matrix, vector, (matrixElement, vectorElement) -> matrixElement - vectorElement);
     }
 
+    public static double[][] fillMatrixWithValue(double[][] matrix, double value) {
+        validateMatrix(matrix);
+        return operateOnMatrix(matrix, value, (matrixElement, valueElement) -> valueElement);
+    }
+
     private static double[][] operateOnMatrixAndVector(double[][] matrix, double[] vector, BiFunction<Double, Double, Double> operation) {
         double[][] resultMatrix = new double[matrix.length][];
         for (int i = 0; i < resultMatrix.length; i++) {

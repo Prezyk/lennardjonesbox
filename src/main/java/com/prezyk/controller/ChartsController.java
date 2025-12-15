@@ -5,6 +5,7 @@ import com.prezyk.md.Simulation;
 import com.prezyk.event.SimulationCalculationsFinishedEvent;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.Pane;
@@ -19,6 +20,9 @@ public class ChartsController {
 
     @FXML
     ScatterChart<Number, Number> chart;
+
+    @FXML
+    NumberAxis yAxis;
 
     public void initialize() {
         EventDispatcher eventDispatcher = EventDispatcher.getInstance();

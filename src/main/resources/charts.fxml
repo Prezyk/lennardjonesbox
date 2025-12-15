@@ -5,13 +5,13 @@
       fx:controller="com.prezyk.controller.ChartsController"
       prefWidth="800"
       prefHeight="800"
-      styleClass="animation-pane" >
+      stylesheets="charts.css">
     <ScatterChart fx:id="chart" prefHeight="700" prefWidth="700" legendSide="TOP">
         <xAxis>
-            <NumberAxis/>
+            <NumberAxis label="time"/>
         </xAxis>
         <yAxis>
-            <NumberAxis/>
+            <NumberAxis fx:id="yAxis" label="energy"/>
         </yAxis>
     </ScatterChart>
 </Pane>

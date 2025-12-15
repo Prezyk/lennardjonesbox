@@ -5,6 +5,7 @@ import java.util.Random;
 public class InitialConditionsGenerator {
 
     private final SimulationInput simulationInput;
+    private boolean j = true;
 
     public InitialConditionsGenerator(SimulationInput simulationInput) {
         this.simulationInput = simulationInput;
@@ -37,10 +38,15 @@ public class InitialConditionsGenerator {
     }
 
     private double[] generateInitialVelocity() {
-        Random random = new Random();
+//        Random random = new Random();
+//        return new double[] {
+//                random.nextDouble() * 10 - 5,
+//                random.nextDouble() * 10 - 5,
+//        };
+        j = !j;
         return new double[] {
-                random.nextDouble() * 10 - 5,
-                random.nextDouble() * 10 - 5,
+                j ? -20 : 20,
+                0
         };
     }
 

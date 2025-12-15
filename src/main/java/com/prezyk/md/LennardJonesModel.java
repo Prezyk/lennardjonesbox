@@ -2,12 +2,19 @@ package com.prezyk.md;
 
 import static com.prezyk.util.VectorUtil.*;
 
-public class LennardJonesModel {
+public class LennardJonesModel implements MotionModel {
+    private final double epsilon;
+    private final double mass;
+    private final double sigma;
 
-    public static double[][] calculateCurrentAcceleration(double[][] currentPositions,
-                                                   double epsilon,
-                                                   double mass,
-                                                   double sigma) {
+    public LennardJonesModel(double epsilon, double mass, double sigma) {
+        this.epsilon = epsilon;
+        this.mass = mass;
+        this.sigma = sigma;
+    }
+
+    @Override
+    public double[][] calculateNextAcceleration(double[][] currentPositions) {
         double[][] accelerationMatrix = new double[currentPositions.length][];
         for (int i = 0; i < currentPositions.length; i++) {
             double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, currentPositions);
@@ -20,7 +27,8 @@ public class LennardJonesModel {
         return accelerationMatrix;
     }
 
-    public static double calculatePotentialEnergy(double[][] currentPositions, double epsilon, double sigma) {
+    @Override
+    public double calculatePotentialEnergy(double[][] currentPositions) {
         double potentialEnergy = 0;
         for (int i = 0; i < currentPositions.length; i++) {
             double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, currentPositions);
@@ -31,16 +39,16 @@ public class LennardJonesModel {
         return potentialEnergy;
     }
 
-    private static double[][] calculateMoleculeDistances(int moleculeIndex, double[][] moleculesPositions) {
+    private double[][] calculateMoleculeDistances(int moleculeIndex, double[][] moleculesPositions) {
         double[][] otherMoleculesPositions = removeVectorFromMatrix(moleculesPositions, moleculeIndex);
         return subtractVectorFromMatrix(otherMoleculesPositions, moleculesPositions[moleculeIndex]);
     }
 
-    private static double[] calculateResultantForceForMolecule(double[][] moleculeForceMatrix) {
+    private double[] calculateResultantForceForMolecule(double[][] moleculeForceMatrix) {
         return sumMatrixVectors(moleculeForceMatrix);
     }
 
-    private static double[][] calculateForcesForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules,
+    private double[][] calculateForcesForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules,
                                             double epsilon,
                                             double sigma) {
         return multiplyMatrix(
@@ -64,7 +72,7 @@ public class LennardJonesModel {
         );
     }
 
-    private static double calculateEnergyForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules,
+    private double calculateEnergyForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules,
                                                      double epsilon,
                                                      double sigma) {
         double[] scalarDistanceVector = matrixVectorLengths(moleculeDistanceMatrixFromOtherMolecules);
