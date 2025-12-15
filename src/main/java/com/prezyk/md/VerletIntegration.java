@@ -49,12 +49,6 @@ public class VerletIntegration {
         return boxState;
     }
 
-    private double calculatePotentialEnergy(double[][] positionsMatrix) {
-        double potentialEnergy = 0.;
-
-        return potentialEnergy;
-    }
-
     private Double calculateKineticEnergy(MoleculeState[] moleculesStates, double mass) {
         double kineticEnergy = 0.;
         for (MoleculeState moleculeState: moleculesStates) {

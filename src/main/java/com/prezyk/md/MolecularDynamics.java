@@ -17,7 +17,7 @@ public class MolecularDynamics {
         InitialConditionsGenerator initialConditionsGenerator = new InitialConditionsGenerator(simulationInput);
         currentMoleculesStates = initialConditionsGenerator.generateInitialConditions();
         integrator = new VerletIntegration();
-        integrator.registerModel(new LennardJonesModel(simulationInput.getEpsilon(), simulationInput.getMass(), 1));
+        integrator.registerModel(new LennardJonesModel(simulationInput.getEpsilon(), simulationInput.getMass(), simulationInput.getSigma()));
         integrator.registerModel(new ElasticBoxModel(simulationInput.getWallStiffness(), simulationInput.getBoxSize(), simulationInput.getMass()));
         currentBoxState = integrator.calculateNextBoxState(currentMoleculesStates, simulationInput.getMass());
         simulation.setState(0, 0, currentBoxState, Arrays.stream(currentMoleculesStates)

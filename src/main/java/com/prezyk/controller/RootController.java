@@ -29,8 +29,12 @@ public class RootController {
 
         CompletableFuture<Simulation> futureSimulationResult = molecularDynamics.calculateSimulationConcurrent();
 
+        System.out.println("After calculate run");
+
         futureSimulationResult.thenAccept(molecules -> EventDispatcher.getInstance()
                                                                       .dispatchEvent(new SimulationCalculationsFinishedEvent(molecules)));
+
+        System.out.println("After accept");
     }
 
 }

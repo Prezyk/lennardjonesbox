@@ -164,9 +164,34 @@
                GridPane.rowSpan="1"
                GridPane.halignment="CENTER"
                GridPane.valignment="TOP" />
-        <Label text="Wall stiffness"
+        <Label text="Sigma"
                GridPane.columnIndex="0"
                GridPane.rowIndex="12"
+               GridPane.columnSpan="1"
+               GridPane.rowSpan="1"
+               GridPane.halignment="CENTER"
+               GridPane.valignment="TOP" />
+        <TextField fx:id="txtSigma"
+                   maxWidth="50"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="13"
+                   GridPane.columnSpan="1"
+                   GridPane.rowSpan="1"
+                   GridPane.halignment="CENTER"
+                   GridPane.valignment="TOP" />
+        <Label fx:id="labelInvalidSigma"
+               text="Invalid value"
+               textFill="red"
+               visible="false"
+               GridPane.columnIndex="1"
+               GridPane.rowIndex="14"
+               GridPane.columnSpan="1"
+               GridPane.rowSpan="1"
+               GridPane.halignment="CENTER"
+               GridPane.valignment="TOP" />
+        <Label text="Wall stiffness"
+               GridPane.columnIndex="0"
+               GridPane.rowIndex="15"
                GridPane.columnSpan="1"
                GridPane.rowSpan="1"
                GridPane.halignment="CENTER"
@@ -174,7 +199,7 @@
         <TextField fx:id="txtWallStiffness"
                    maxWidth="50"
                    GridPane.columnIndex="1"
-                   GridPane.rowIndex="12"
+                   GridPane.rowIndex="16"
                    GridPane.columnSpan="1"
                    GridPane.rowSpan="1"
                    GridPane.halignment="CENTER"
@@ -184,7 +209,7 @@
                textFill="red"
                visible="false"
                GridPane.columnIndex="1"
-               GridPane.rowIndex="13"
+               GridPane.rowIndex="17"
                GridPane.columnSpan="1"
                GridPane.rowSpan="1"
                GridPane.halignment="CENTER"
@@ -237,4 +262,5 @@
     </fx:define>
     <Label text="Save" />
     <Button prefWidth="100" onAction="#btnSaveAction" text="Save" />
+    <Button text="Simulate function" prefWidth="200" onAction="#btnSimulateFunction"/>
 </VBox>

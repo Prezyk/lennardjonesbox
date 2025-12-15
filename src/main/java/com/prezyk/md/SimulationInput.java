@@ -9,8 +9,9 @@ public class SimulationInput {
     private final double timeStep;
     private final double boxSize;
     private final double wallStiffness;
+    private final double sigma;
 
-    private SimulationInput(int moleculesQuantity, double moleculeRadius, double epsilon, double mass, double time, double timeStep, double boxSize, double wallStiffness) {
+    private SimulationInput(int moleculesQuantity, double moleculeRadius, double epsilon, double mass, double time, double timeStep, double boxSize, double wallStiffness, double sigma) {
         this.moleculesQuantity = moleculesQuantity;
         this.moleculeRadius = moleculeRadius;
         this.epsilon = epsilon;
@@ -19,6 +20,7 @@ public class SimulationInput {
         this.timeStep = timeStep;
         this.boxSize = boxSize;
         this.wallStiffness = wallStiffness;
+        this.sigma = sigma;
     }
 
     public static Builder builder() {
@@ -34,6 +36,7 @@ public class SimulationInput {
         double timeStep;
         double boxSize;
         double wallStiffness;
+        double sigma;
 
         private Builder() {}
 
@@ -77,6 +80,11 @@ public class SimulationInput {
             return this;
         }
 
+        public Builder sigma(double sigma) {
+            this.sigma = sigma;
+            return this;
+        }
+
         public SimulationInput build() {
             return new SimulationInput(moleculesQuantity,
                                        moleculeRadius,
@@ -85,7 +93,8 @@ public class SimulationInput {
                                        time,
                                        timeStep,
                                        boxSize,
-                                       wallStiffness);
+                                       wallStiffness,
+                                       sigma);
         }
     }
 
@@ -123,5 +132,9 @@ public class SimulationInput {
 
     public int getTimeStepsAmount() {
         return (int) Math.floor(time / timeStep);
+    }
+
+    public double getSigma() {
+        return sigma;
     }
 }

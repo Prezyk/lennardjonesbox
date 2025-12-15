@@ -1,8 +1,10 @@
 package com.prezyk.controller;
 
 import com.prezyk.event.EventDispatcher;
-import com.prezyk.md.Simulation;
 import com.prezyk.event.SimulationCalculationsFinishedEvent;
+import com.prezyk.event.SimulationFunctionRunEvent;
+import com.prezyk.md.LennardJonesModel;
+import com.prezyk.md.Simulation;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.chart.NumberAxis;
@@ -27,6 +29,7 @@ public class ChartsController {
     public void initialize() {
         EventDispatcher eventDispatcher = EventDispatcher.getInstance();
         eventDispatcher.registerEventHandler(SimulationCalculationsFinishedEvent.class, this::simulationCalculationsFinishedEventHandler);
+        eventDispatcher.registerEventHandler(SimulationFunctionRunEvent.class, this::simulationFunctionRunEventHandler);
     }
 
     private void reloadChartData(Simulation molecules) {
@@ -80,9 +83,37 @@ public class ChartsController {
         }
     }
 
+    private void loadChart(XYChart.Series<Number, Number> series, double[] timeSeries, double[] timePoints) {
+        series.getData()
+              .clear();
+
+        if (timeSeries.length != timePoints.length)
+            throw new IllegalArgumentException("Time series should have the same amount of points as time points.");
+
+        for (int i = 0; i < timePoints.length; i++) {
+            series.getData()
+                  .add(new XYChart.Data<>(timePoints[i], timeSeries[i]));
+        }
+    }
+
     private void simulationCalculationsFinishedEventHandler(SimulationCalculationsFinishedEvent event) {
         Simulation molecules = event.getMolecules();
         Platform.runLater(() -> reloadChartData(molecules));
+    }
+
+    private void simulationFunctionRunEventHandler(SimulationFunctionRunEvent event) {
+        LennardJonesModel lj = new LennardJonesModel(event.getSimulationInput().getEpsilon(), event.getSimulationInput().getMass(), event.getSimulationInput().getSigma());
+        double[] functionValues = lj.calculateEnergyInFunctionOfDistance(event.getDistances());
+        chart.getData()
+             .clear();
+        XYChart.Series<Number, Number> series = new XYChart.Series<>();
+        series.setName("Function");
+        chart.getData()
+             .add(series);
+        for (double t: event.getDistances()) {
+            System.out.println(t);
+        }
+        loadChart(series, functionValues, event.getDistances());
     }
 
 }

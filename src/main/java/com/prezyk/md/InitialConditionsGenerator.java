@@ -4,8 +4,7 @@ import java.util.Random;
 
 public class InitialConditionsGenerator {
 
-    private final SimulationInput simulationInput;
-    private boolean j = true;
+    protected final SimulationInput simulationInput;
 
     public InitialConditionsGenerator(SimulationInput simulationInput) {
         this.simulationInput = simulationInput;
@@ -48,5 +47,4 @@ public class InitialConditionsGenerator {
     private double[] generateInitialAcceleration() {
         return new double[] {0, 0};
     }
-
 }

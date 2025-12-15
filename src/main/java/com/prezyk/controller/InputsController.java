@@ -1,8 +1,9 @@
 package com.prezyk.controller;
 
 import com.prezyk.event.EventDispatcher;
-import com.prezyk.md.SimulationInput;
 import com.prezyk.event.SimulationConditionsConfirmedEvent;
+import com.prezyk.event.SimulationFunctionRunEvent;
+import com.prezyk.md.SimulationInput;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -39,6 +40,9 @@ public class InputsController {
     TextField txtBoxSize;
 
     @FXML
+    TextField txtSigma;
+
+    @FXML
     TextField txtWallStiffness;
 
     @FXML
@@ -61,6 +65,9 @@ public class InputsController {
 
     @FXML
     Label labelInvalidBoxSize;
+
+    @FXML
+    Label labelInvalidSigma;
 
     @FXML
     Label labelInvalidWallStiffness;
@@ -132,6 +139,16 @@ public class InputsController {
 
     }
 
+    @FXML
+    public void btnSimulateFunction() {
+        SimulationInput simulationInput = readSimulationConditions();
+        double[] distanceVector = new double[(int)simulationInput.getBoxSize()];
+        for (int i = 0; i < simulationInput.getBoxSize(); i++) {
+            distanceVector[i] = i+2;
+        }
+        EventDispatcher.getInstance().dispatchEvent(new SimulationFunctionRunEvent(distanceVector, simulationInput));
+    }
+
     private Double getValidValue(TextField valueField, Label errorLabel) {
         return getValidValue(valueField, errorLabel, dummy -> Boolean.FALSE);
     }
@@ -161,6 +178,7 @@ public class InputsController {
                               .moleculesQuantity(getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0).intValue())
                               .boxSize(getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate <= 0))
                               .wallStiffness(getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0))
+                .sigma(getValidValue(txtSigma, labelInvalidSigma, sigmaToValidate -> sigmaToValidate <= 0))
                               .build();
     }
 }

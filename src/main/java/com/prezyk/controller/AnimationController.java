@@ -18,7 +18,9 @@ import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class AnimationController {
     @FXML
@@ -76,24 +78,57 @@ public class AnimationController {
         stop = true;
     }
 
-    private void prepareAnimationData(Simulation simulation) {
+    private CompletableFuture<Void> prepareAnimationData(Simulation simulation) throws InterruptedException {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(simulation.getMoleculesQuantity());
+        List<Callable<Void>> callables = new ArrayList<>();
+        HashMap<Integer, Void> finishedMolecules = new HashMap<>();
+
+        System.out.println("Starting preparation with " + simulation);
+        for (int a = 0; a < simulation.getMoleculesQuantity(); a++) {
+            int b = a;
+            callables.add(() -> {
+                prepareMoleculeAnimation(simulation, b, future, finishedMolecules);
+                return null;
+            });
+        }
+        executorService.invokeAll(callables);
+        return future;
+    }
+
+    private void prepareMoleculeAnimation(Simulation simulation, int moleculeIndex, CompletableFuture<Void> future, HashMap<Integer, Void> hashMap) {
+        System.out.println("Starting preparation for " + moleculeIndex);
         for (int i = 0; i < simulation.getTimePoints(); i++) {
-            for (int a = 0; a < simulation.getMoleculesQuantity(); a++) {
+            double xCoord = simulation.getPositionVectors()[moleculeIndex][i][0] * animationPane.getWidth() / simulation.getBoxSize();
+            double yCoord = animationPane.getHeight() - simulation.getPositionVectors()[moleculeIndex][i][1] * animationPane.getHeight() / simulation.getBoxSize();
+            pathList.get(moleculeIndex)
+                    .getElements()
+                    .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
+        }
+        System.out.println("Completed loop for " + moleculeIndex);
+        completeFutureIfAllDone(simulation, moleculeIndex, future, hashMap);
+    }
 
-                double xCoord = simulation.getPositionVectors()[a][i][0] * animationPane.getWidth() / simulation.getBoxSize();
-                double yCoord = animationPane.getHeight() - simulation.getPositionVectors()[a][i][1] * animationPane.getHeight() / simulation.getBoxSize();
-                pathList.get(a)
-                        .getElements()
-                        .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
-
-            }
+    private synchronized void completeFutureIfAllDone(Simulation simulation, int moleculeIndex, CompletableFuture<Void> future, HashMap<Integer, Void> hashMap) {
+        hashMap.put(moleculeIndex, null);
+        System.out.println("Finished calculating transitions for " + moleculeIndex);
+        if (hashMap.keySet().size() == simulation.getMoleculesQuantity()) {
+            System.out.println("Completing preparation...");
+            future.complete(null);
         }
     }
 
-    private void animateMolecules(Simulation molecules) {
-        for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
-            ptr.add(createPathTransition(atoms.get(i), pathList.get(i), molecules.getDuration()));
-        }
+    private CompletableFuture<Void> animateMolecules(Simulation molecules) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        new Thread(() -> {
+            System.out.println("Starting animation with " + molecules);
+            ptr = new ArrayList<>();
+            for (int i = 0; i < molecules.getMoleculesQuantity(); i++) {
+                ptr.add(createPathTransition(atoms.get(i), pathList.get(i), molecules.getDuration()));
+            }
+            future.complete(null);
+        }).start();
+        return future;
     }
 
     private PathTransition createPathTransition(Circle node, Path path, double time) {
@@ -130,17 +165,22 @@ public class AnimationController {
 
     private void simulationCalculationsFinishedEventHandler(SimulationCalculationsFinishedEvent event) {
         Simulation molecules = event.getMolecules();
-        Platform.runLater(() -> {
-            prepareAnimationData(molecules);
-            ptr = new ArrayList<>();
-            animateMolecules(molecules);
-            calculationStatusLabel.setText("Calculation done");
-            tbtnPause.setDisable(false);
-            tbtnPlay.setDisable(false);
-            tbtnStop.setDisable(false);
-            for (Circle C : atoms) {
-                animationPane.getChildren().add(C);
-            }
-        });
+        System.out.println("Simulation finished event");
+        try {
+            prepareAnimationData(molecules).thenCompose((x) -> animateMolecules(molecules)).thenApply((x) -> {
+                Platform.runLater(() -> {
+                    calculationStatusLabel.setText("Calculation done");
+                    tbtnPause.setDisable(false);
+                    tbtnPlay.setDisable(false);
+                    tbtnStop.setDisable(false);
+                    for (Circle C : atoms) {
+                        animationPane.getChildren().add(C);
+                    }
+                });
+                return null;
+            });
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
