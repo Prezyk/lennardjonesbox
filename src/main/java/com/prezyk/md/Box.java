@@ -21,14 +21,6 @@ public class Box {
         return size;
     }
 
-    public double getWallStiffness() {
-        return wallStiffness;
-    }
-
-    public BoxState[] getBoxStates() {
-        return boxStates;
-    }
-
     public Double[] getKineticEnergySeries() {
         return Arrays.stream(boxStates)
                      .map(BoxState::getKineticEnergy)
@@ -37,13 +29,13 @@ public class Box {
 
     public Double[] getPotentialEnergySeries() {
         return Arrays.stream(boxStates)
-                     .map(BoxState::getPotentialEnergy)
+                     .map(boxState -> boxState.getPotentialEnergy(LennardJonesModel.POTENTIAL_ENERGY_KEY))
                      .toArray(Double[]::new);
     }
 
     public Double[] getElasticEnergySeries() {
         return Arrays.stream(boxStates)
-                     .map(BoxState::getElasticEnergy)
+                     .map(boxState -> boxState.getPotentialEnergy(ElasticBoxModel.POTENTIAL_ENERGY_KEY))
                      .toArray(Double[]::new);
     }
 

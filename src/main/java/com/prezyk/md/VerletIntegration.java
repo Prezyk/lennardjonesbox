@@ -1,21 +1,24 @@
 package com.prezyk.md;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.List;
 
 import static com.prezyk.util.VectorUtil.*;
 
 public class VerletIntegration {
 
-    private final MotionModel motionModel;
+    private final List<MotionModel> motionModels;
 
-    public VerletIntegration(MotionModel motionModel) {
-        this.motionModel = motionModel;
+    public VerletIntegration() {
+        this.motionModels = new ArrayList<>();
     }
 
-    public MoleculeState[] calculateNextMoleculeStates(MoleculeState[] currentMoleculesStates, double timeStep,
-                                                              BiFunction<double[][], double[][], double[][]> additionalAccelerationImpact) {
+    public void registerModel(MotionModel motionModel) {
+        this.motionModels.add(motionModel);
+    }
+
+    public MoleculeState[] calculateNextMoleculeStates(MoleculeState[] currentMoleculesStates, double timeStep) {
         double[][] positionsMatrix = extractPositionsMatrix(currentMoleculesStates);
         double[][] velocitiesMatrix = extractVelocitiesMatrix(currentMoleculesStates);
         double[][] accelerationsMatrix = extractAccelerationsMatrix(currentMoleculesStates);
@@ -24,19 +27,32 @@ public class VerletIntegration {
                 addMatrices(positionsMatrix, multiplyMatrix(velocitiesMatrix, timeStep)),
                 multiplyMatrix(accelerationsMatrix, Math.pow(timeStep, 2) / 2.)
         );
-        double[][] nextAccelerationsMatrix = motionModel.calculateNextAcceleration(nextPositionsMatrix);
-        nextAccelerationsMatrix = additionalAccelerationImpact.apply(nextAccelerationsMatrix, nextPositionsMatrix);
+        double[][] nextAccelerationsMatrix = calculateNextAcceleration(nextPositionsMatrix);
         double[][] nextVelocitiesMatrix = addMatrices(velocitiesMatrix, multiplyMatrix(addMatrices(accelerationsMatrix, nextAccelerationsMatrix), timeStep / 2.));
         return convertToMoleculeStates(nextPositionsMatrix, nextVelocitiesMatrix, nextAccelerationsMatrix);
     }
 
-    public BoxState calculateNextBoxState(MoleculeState[] nextMoleculesStates,
-                                                 double mass,
-                                                 Function<double[][], Double> additionalEnergy) {
+    private double[][] calculateNextAcceleration(double[][] nextPositionsMatrix) {
+        double[][] accelerationMatrix = new double[nextPositionsMatrix.length][nextPositionsMatrix[0].length];
+        for (MotionModel motionModel: motionModels) {
+            accelerationMatrix = addMatrices(accelerationMatrix, motionModel.calculateNextAcceleration(nextPositionsMatrix));
+        }
+        return accelerationMatrix;
+    }
+
+    public BoxState calculateNextBoxState(MoleculeState[] nextMoleculesStates, double mass) {
         double kineticEnergy = calculateKineticEnergy(nextMoleculesStates, mass);
-        double elasticEnergy = additionalEnergy.apply(extractPositionsMatrix(nextMoleculesStates));
-        double potentialEnergy = motionModel.calculatePotentialEnergy(extractPositionsMatrix(nextMoleculesStates));
-        return new BoxState(kineticEnergy, elasticEnergy, potentialEnergy);
+        BoxState boxState = new BoxState(kineticEnergy);
+        for (MotionModel motionModel: motionModels) {
+            boxState.putPotentialEnergy(motionModel.getPotentialEnergyKey(), motionModel.calculatePotentialEnergy(extractPositionsMatrix(nextMoleculesStates)));
+        }
+        return boxState;
+    }
+
+    private double calculatePotentialEnergy(double[][] positionsMatrix) {
+        double potentialEnergy = 0.;
+
+        return potentialEnergy;
     }
 
     private Double calculateKineticEnergy(MoleculeState[] moleculesStates, double mass) {

@@ -1,7 +1,9 @@
 package com.prezyk.md;
 
 public interface MotionModel {
-    double[][] calculateNextAcceleration(double[][] currentPositions);
+    double[][] calculateNextAcceleration(double[][] nextPositionsMatrix);
 
-    double calculatePotentialEnergy(double[][] currentPositions);
+    double calculatePotentialEnergy(double[][] positionsMatrix);
+
+    String getPotentialEnergyKey();
 }

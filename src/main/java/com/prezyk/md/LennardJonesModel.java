@@ -3,6 +3,8 @@ package com.prezyk.md;
 import static com.prezyk.util.VectorUtil.*;
 
 public class LennardJonesModel implements MotionModel {
+    public static final String POTENTIAL_ENERGY_KEY = "LJ potential energy";
+
     private final double epsilon;
     private final double mass;
     private final double sigma;
@@ -14,10 +16,10 @@ public class LennardJonesModel implements MotionModel {
     }
 
     @Override
-    public double[][] calculateNextAcceleration(double[][] currentPositions) {
-        double[][] accelerationMatrix = new double[currentPositions.length][];
-        for (int i = 0; i < currentPositions.length; i++) {
-            double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, currentPositions);
+    public double[][] calculateNextAcceleration(double[][] nextPositionsMatrix) {
+        double[][] accelerationMatrix = new double[nextPositionsMatrix.length][];
+        for (int i = 0; i < nextPositionsMatrix.length; i++) {
+            double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, nextPositionsMatrix);
             double[][] moleculeForces = calculateForcesForMolecule(relativeMoleculeDistances,
                                                                    epsilon,
                                                                    sigma);
@@ -37,6 +39,11 @@ public class LennardJonesModel implements MotionModel {
                                                                    sigma);
         }
         return potentialEnergy;
+    }
+
+    @Override
+    public String getPotentialEnergyKey() {
+        return POTENTIAL_ENERGY_KEY;
     }
 
     private double[][] calculateMoleculeDistances(int moleculeIndex, double[][] moleculesPositions) {
@@ -68,7 +75,7 @@ public class LennardJonesModel implements MotionModel {
                                 Math.pow(sigma, 6)
                         )
                 ),
-                (-24) * epsilon
+                (24) * epsilon
         );
     }
 
