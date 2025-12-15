@@ -1,5 +1,9 @@
 package com.prezyk.md;
 
+import com.prezyk.md.model.ElasticBoxModel;
+import com.prezyk.md.model.LennardJonesModel;
+import com.prezyk.md.state.BoxState;
+
 import java.util.Arrays;
 
 public class Box {

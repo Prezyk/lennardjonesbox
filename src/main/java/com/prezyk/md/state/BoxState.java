@@ -1,4 +1,4 @@
-package com.prezyk.md;
+package com.prezyk.md.state;
 
 import java.util.HashMap;
 

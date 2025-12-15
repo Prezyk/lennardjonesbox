@@ -1,5 +1,7 @@
 package com.prezyk.md;
 
+import com.prezyk.md.state.MoleculeState;
+
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;

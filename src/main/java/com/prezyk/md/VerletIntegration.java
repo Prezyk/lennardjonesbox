@@ -1,5 +1,9 @@
 package com.prezyk.md;
 
+import com.prezyk.md.model.MotionModel;
+import com.prezyk.md.state.BoxState;
+import com.prezyk.md.state.MoleculeState;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,15 +62,15 @@ public class VerletIntegration {
     }
 
     private double[][] extractPositionsMatrix(MoleculeState[] moleculeStates) {
-        return Arrays.stream(moleculeStates).map(com.prezyk.md.MoleculeState::getPositionVector).toArray(double[][]::new);
+        return Arrays.stream(moleculeStates).map(MoleculeState::getPositionVector).toArray(double[][]::new);
     }
 
     private double[][] extractVelocitiesMatrix(MoleculeState[] moleculeStates) {
-        return Arrays.stream(moleculeStates).map(com.prezyk.md.MoleculeState::getVelocityVector).toArray(double[][]::new);
+        return Arrays.stream(moleculeStates).map(MoleculeState::getVelocityVector).toArray(double[][]::new);
     }
 
     private double[][] extractAccelerationsMatrix(MoleculeState[] moleculeStates) {
-        return Arrays.stream(moleculeStates).map(com.prezyk.md.MoleculeState::getAccelerationVector).toArray(double[][]::new);
+        return Arrays.stream(moleculeStates).map(MoleculeState::getAccelerationVector).toArray(double[][]::new);
     }
 
     private MoleculeState[] convertToMoleculeStates(double[][] positions, double[][] velocities, double[][] accelerations) {

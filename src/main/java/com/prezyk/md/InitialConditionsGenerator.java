@@ -1,5 +1,7 @@
 package com.prezyk.md;
 
+import com.prezyk.md.state.MoleculeState;
+
 import java.util.Random;
 
 public class InitialConditionsGenerator {

@@ -1,4 +1,4 @@
-package com.prezyk.md;
+package com.prezyk.md.model;
 
 import static com.prezyk.util.VectorUtil.*;
 

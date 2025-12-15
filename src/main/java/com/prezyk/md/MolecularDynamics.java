@@ -1,5 +1,10 @@
 package com.prezyk.md;
 
+import com.prezyk.md.model.ElasticBoxModel;
+import com.prezyk.md.model.LennardJonesModel;
+import com.prezyk.md.state.BoxState;
+import com.prezyk.md.state.MoleculeState;
+
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 

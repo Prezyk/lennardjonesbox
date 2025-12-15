@@ -1,5 +1,8 @@
 package com.prezyk.md;
 
+import com.prezyk.md.state.BoxState;
+import com.prezyk.md.state.MoleculeState;
+
 import java.util.Arrays;
 
 public class Simulation {

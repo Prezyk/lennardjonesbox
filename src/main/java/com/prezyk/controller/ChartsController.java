@@ -3,7 +3,7 @@ package com.prezyk.controller;
 import com.prezyk.event.EventDispatcher;
 import com.prezyk.event.SimulationCalculationsFinishedEvent;
 import com.prezyk.event.SimulationFunctionRunEvent;
-import com.prezyk.md.LennardJonesModel;
+import com.prezyk.md.model.LennardJonesModel;
 import com.prezyk.md.Simulation;
 import javafx.application.Platform;
 import javafx.fxml.FXML;

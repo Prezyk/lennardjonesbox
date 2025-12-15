@@ -1,5 +1,7 @@
 package com.prezyk.md;
 
+import com.prezyk.md.state.MoleculeState;
+
 public class TwoMoleculesCollision extends InitialConditionsGenerator {
 
     public TwoMoleculesCollision(SimulationInput simulationInput) {
