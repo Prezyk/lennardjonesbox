@@ -20,10 +20,10 @@ public class ChartMapper {
     public ChartMapper(Simulation simulation) {
         this.simulation = simulation;
         this.namedTimeSeries = new HashMap<>();
-//        this.namedTimeSeries.put(KINETIC_ENERGY, simulation.getKineticEnergySeries());
+        this.namedTimeSeries.put(KINETIC_ENERGY, simulation.getKineticEnergySeries());
         this.namedTimeSeries.put(POTENTIAL_ENERGY, simulation.getPotentialEnergySeries());
-//        this.namedTimeSeries.put(BOX_ELASTIC_ENERGY, simulation.getBoxElasticEnergySeries());
-//        this.namedTimeSeries.put(TOTAL_ENERGY, simulation.getTotalEnergySeries());
+        this.namedTimeSeries.put(BOX_ELASTIC_ENERGY, simulation.getBoxElasticEnergySeries());
+        this.namedTimeSeries.put(TOTAL_ENERGY, simulation.getTotalEnergySeries());
     }
 
     public double[] getTimePoints() {

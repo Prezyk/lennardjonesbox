@@ -104,6 +104,9 @@ public class AnimationController {
             pathList.get(moleculeIndex)
                     .getElements()
                     .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
+            if (i % 2000 == 0) {
+                System.out.println("Progress molecule " + moleculeIndex + " : " + i + " out of " + simulation.getTimePoints());
+            }
         }
         System.out.println("Completed loop for " + moleculeIndex);
         completeFutureIfAllDone(simulation, moleculeIndex, future, hashMap);

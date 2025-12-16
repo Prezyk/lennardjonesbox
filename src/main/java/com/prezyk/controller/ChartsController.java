@@ -33,9 +33,11 @@ public class ChartsController {
     }
 
     private void reloadChartData(Simulation molecules) {
+        System.out.println("Starting reload of charts");
         ChartMapper chartMapper = new ChartMapper(molecules);
         resetChartsIfNeeded(chartMapper);
         loadAllCharts(chartMapper);
+        System.out.println("Finished chart reload");
     }
 
     private void resetChartsIfNeeded(ChartMapper chartMapper) {
@@ -66,6 +68,7 @@ public class ChartsController {
     }
 
     private void loadAllCharts(ChartMapper chartMapper) {
+        System.out.println("Loading charts...");
         chart.getData()
              .forEach(series -> loadChart(series, chartMapper.getTimeSeries(series.getName()), chartMapper.getTimePoints()));
     }
@@ -73,7 +76,7 @@ public class ChartsController {
     private void loadChart(XYChart.Series<Number, Number> series, Double[] timeSeries, double[] timePoints) {
         series.getData()
               .clear();
-
+        System.out.println("Loading chart: " + series.getName());
         if (timeSeries.length != timePoints.length)
             throw new IllegalArgumentException("Time series should have the same amount of points as time points.");
 
