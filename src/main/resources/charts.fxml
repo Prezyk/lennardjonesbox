@@ -6,12 +6,12 @@
       prefWidth="800"
       prefHeight="800"
       stylesheets="charts.css">
-    <ScatterChart fx:id="chart" prefHeight="700" prefWidth="700" legendSide="TOP">
+    <ScatterChart fx:id="chart" minHeight="700" minWidth="700" >
         <xAxis>
             <NumberAxis label="time"/>
         </xAxis>
         <yAxis>
-            <NumberAxis fx:id="yAxis" label="energy"/>
+            <NumberAxis fx:id="yAxis"/>
         </yAxis>
     </ScatterChart>
 </Pane>
