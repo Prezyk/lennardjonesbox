@@ -72,12 +72,8 @@
                 <configuration>
                 </configuration>
             </plugin>
-
-
         </plugins>
-
     </build>
-
 
     <distributionManagement>
         <repository>

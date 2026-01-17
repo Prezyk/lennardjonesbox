@@ -34,7 +34,7 @@ public class Assertions {
         }
     }
 
-    private static String formatMatrix(BigDecimal[][] matrix) {
+    public static String formatMatrix(BigDecimal[][] matrix) {
         return Arrays.stream(matrix)
                      .map(row -> Arrays.stream(row).map(BigDecimal::toString).collect(Collectors.joining(",\t")))
                      .map(row -> "[" + row + "]")

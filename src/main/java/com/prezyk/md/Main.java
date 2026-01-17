@@ -17,6 +17,5 @@ public class Main {
 
         MolecularDynamics molecularDynamics = new MolecularDynamics(simulationInput);
         Simulation simulation = molecularDynamics.calculateSimulation();
-        System.out.println("");
     }
 }

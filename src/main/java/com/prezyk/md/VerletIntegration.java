@@ -39,7 +39,7 @@ public class VerletIntegration {
     }
 
     private BigDecimal[][] calculateNextAcceleration(BigDecimal[][] nextPositionsMatrix) {
-        BigDecimal[][] accelerationMatrix = new BigDecimal[nextPositionsMatrix.length][nextPositionsMatrix[0].length];
+        BigDecimal[][] accelerationMatrix = initializeZeroMatrix(nextPositionsMatrix.length, nextPositionsMatrix[0].length);
         for (MotionModel motionModel: motionModels) {
             accelerationMatrix = addMatrices(accelerationMatrix, motionModel.calculateNextAcceleration(nextPositionsMatrix));
         }

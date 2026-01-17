@@ -1,5 +1,6 @@
 package com.prezyk.util;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -8,6 +9,20 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class VectorUtil {
+
+    public static BigDecimal[][] initializeZeroMatrix(int rows, int columns) {
+        BigDecimal[][] matrix = new BigDecimal[rows][];
+        for (int i = 0; i < rows; i++) {
+            matrix[i] = initializeZeroVector(columns);
+        }
+        return matrix;
+    }
+
+    public static BigDecimal[] initializeZeroVector(int length) {
+        BigDecimal[] vector = new BigDecimal[length];
+        Arrays.fill(vector, BigDecimal.ZERO);
+        return vector;
+    }
 
     public static BigDecimal[] copyVector(BigDecimal[] sourceVector) throws VectorSizeException {
         validateVectorSizeNonZeroOrThrow(sourceVector);
@@ -47,7 +62,7 @@ public class VectorUtil {
     }
 
     public static BigDecimal vectorLength(BigDecimal[] vector) {
-        return (vector[0].pow(2).add(vector[1].pow(2))).sqrt(MathContext.UNLIMITED);
+        return (vector[0].pow(2).add(vector[1].pow(2))).sqrt(MathContext.DECIMAL128);
     }
 
     public static BigDecimal[] matrixVectorLengths(BigDecimal[][] matrix) {
@@ -208,11 +223,5 @@ public class VectorUtil {
         if (leftVector.length != rightVector.length) {
             throw VectorSizeException.vectorsSizeMismatch(leftVector.length, rightVector.length);
         }
-    }
-
-    private static BigDecimal[] initializeZeroVector(int length) {
-        BigDecimal[] vector = new BigDecimal[length];
-        Arrays.fill(vector, BigDecimal.ZERO);
-        return vector;
     }
 }
