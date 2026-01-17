@@ -2,6 +2,10 @@ package com.prezyk.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import static com.prezyk.util.CalculationPrecision.PRECISION;
 import static com.prezyk.util.VectorUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,13 +13,18 @@ class VectorUtilTest {
 
     @Test
     void testCopyVectorEmpty() {
-        assertThrows(VectorSizeException.class, () -> copyVector(new double[]{}));
+        assertThrows(VectorSizeException.class, () -> copyVector(new BigDecimal[]{}));
     }
 
     @Test
     void testCopyVector() {
-        double[] vector = new double[] {1, 3, 5, 7};
-        double[] copiedVector = VectorUtil.copyVector(vector);
+        BigDecimal[] vector = new BigDecimal[] {
+                BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(7).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
+        BigDecimal[] copiedVector = VectorUtil.copyVector(vector);
 
         assertNotEquals(vector, copiedVector);
         assertVectorsEquals(vector, copiedVector);
@@ -23,44 +32,70 @@ class VectorUtilTest {
 
     @Test
     void testSumVectorElementsEmpty() {
-        assertThrows(VectorSizeException.class, () -> sumVectorElements(new double[]{}));
+        assertThrows(VectorSizeException.class, () -> sumVectorElements(new BigDecimal[]{}));
     }
 
     @Test
     void testSumVectorElements() {
-        double[] vector = new double[] { 1, 2, 3, 4, 5 };
-        double expectedSum = 15;
+        BigDecimal[] vector = new BigDecimal[] {
+                BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(4).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
+        BigDecimal expectedSum = BigDecimal.valueOf(15).setScale(PRECISION, RoundingMode.HALF_UP);
 
-        double actualSum = sumVectorElements(vector);
+        BigDecimal actualSum = sumVectorElements(vector);
         assertEquals(expectedSum, actualSum);
     }
 
     @Test
     void testDivideVectorEmpty() {
-        assertThrows(VectorSizeException.class, () -> divideVector(new double[]{}, 2));
+        assertThrows(VectorSizeException.class, () -> divideVector(new BigDecimal[]{}, BigDecimal.valueOf(2)
+                                                                                                 .setScale(PRECISION, RoundingMode.HALF_UP)));
     }
 
     @Test
     void testDivideVector() {
-        double[] vector = new double[] {3, 5, 7, 9};
-        double[] actualDividedVector = divideVector(vector, 2.);
+        BigDecimal[] vector = new BigDecimal[] {
+                BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(7).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(9).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
+        BigDecimal[] actualDividedVector = divideVector(vector, BigDecimal.valueOf(2)
+                                                                          .setScale(PRECISION, RoundingMode.HALF_UP));
 
-        double[] expectedDividedVector = new double[] {1.5, 2.5, 3.5, 4.5};
+        BigDecimal[] expectedDividedVector = new BigDecimal[] {
+                BigDecimal.valueOf(1.5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(2.5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(3.5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(4.5).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
 
         assertVectorsEquals(expectedDividedVector, actualDividedVector);
     }
 
     @Test
     void testMultiplyVectorEmpty() {
-        assertThrows(VectorSizeException.class, () -> multiplyVector(new double[]{}, 5));
+        assertThrows(VectorSizeException.class, () -> multiplyVector(new BigDecimal[]{}, BigDecimal.valueOf(5)));
     }
 
     @Test
     void testMultiplyVector() {
-        double[] vector = new double[] {4, 3, 6};
-        double[] actualMultipliedVector = multiplyVector(vector, 4.);
+        BigDecimal[] vector = new BigDecimal[] {
+                BigDecimal.valueOf(4).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(6).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
+        BigDecimal[] actualMultipliedVector = multiplyVector(vector, BigDecimal.valueOf(4.).setScale(PRECISION, RoundingMode.HALF_UP));
 
-        double[] expectedMultipliedVector = new double[] {16, 12, 24};
+        BigDecimal[] expectedMultipliedVector = new BigDecimal[] {
+                BigDecimal.valueOf(16).setScale(PRECISION * 2, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(12).setScale(PRECISION * 2, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(24).setScale(PRECISION * 2, RoundingMode.HALF_UP)
+        };
 
         assertEquals(expectedMultipliedVector.length, actualMultipliedVector.length);
         assertVectorsEquals(expectedMultipliedVector, actualMultipliedVector);
@@ -68,47 +103,87 @@ class VectorUtilTest {
 
     @Test
     void testSubtractVectorsSizeMismatch() {
-        assertThrows(VectorSizeException.class, () -> subtractVectors(new double[2], new double[3]));
+        assertThrows(VectorSizeException.class, () -> subtractVectors(new BigDecimal[2], new BigDecimal[3]));
     }
 
     @Test
     void testSubtractVectors() {
-        double[] leftVector = new double[] {3, 5, -1};
-        double[] rightVector = new double[] {5, 2, 9};
+        BigDecimal[] leftVector = new BigDecimal[] {
+                BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(-1).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
+        BigDecimal[] rightVector = new BigDecimal[] {
+                BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(9).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
 
-        double[] actualResultVector = subtractVectors(leftVector, rightVector);
-        double[] expectedResultVector = new double[] {-2, 3, -10};
+        BigDecimal[] actualResultVector = subtractVectors(leftVector, rightVector);
+        BigDecimal[] expectedResultVector = new BigDecimal[] {
+                BigDecimal.valueOf(-2).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(-10).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
 
         assertVectorsEquals(expectedResultVector, actualResultVector);
     }
 
     @Test
     void testDivideScalarByVectorEmpty() {
-        assertThrows(VectorSizeException.class, () -> divideScalarByVector(2, new double[]{}));
+        assertThrows(VectorSizeException.class, () -> divideScalarByVector(BigDecimal.valueOf(2), new BigDecimal[]{}));
     }
 
     @Test
     void testDivideScalarByVector() {
-        double[] vector = new double[] {10, 5, 2};
-        double scalar = 1;
+        BigDecimal[] vector = new BigDecimal[] {
+                BigDecimal.valueOf(10).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
+        BigDecimal scalar = BigDecimal.ONE.setScale(PRECISION, RoundingMode.HALF_UP);
 
-        double[] actualResultVector = divideScalarByVector(scalar, vector);
-        double[] expectedResultVector = new double[] {0.1, 0.2, 0.5};
+        BigDecimal[] actualResultVector = divideScalarByVector(scalar, vector);
+        BigDecimal[] expectedResultVector = new BigDecimal[] {
+                BigDecimal.valueOf(0.1).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(0.2).setScale(PRECISION, RoundingMode.HALF_UP),
+                BigDecimal.valueOf(0.5).setScale(PRECISION, RoundingMode.HALF_UP)
+        };
         assertVectorsEquals(expectedResultVector, actualResultVector);
     }
 
     @Test
     void testRemoveVectorFromMatrix() {
-        double[][] matrix = new double[][] {
-                new double[] {1, 2, 3},
-                new double[] {4, 5, 6},
-                new double[] {7, 8, 9}
+        BigDecimal[][] matrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(4).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(6).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(7).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(8).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(9).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        double[][] actualResultMatrix = removeVectorFromMatrix(matrix, 1);
-        double[][] expectedResultMatrix = new double[][] {
-                new double[] {1, 2, 3},
-                new double[] {7, 8, 9}
+        BigDecimal[][] actualResultMatrix = removeVectorFromMatrix(matrix, 1);
+        BigDecimal[][] expectedResultMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(7).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(8).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(9).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
         assertMatrixEquals(expectedResultMatrix, actualResultMatrix);
@@ -116,16 +191,36 @@ class VectorUtilTest {
 
     @Test
     void testRemoveFirstVectorFromMatrix() {
-        double[][] matrix = new double[][] {
-                new double[] {1, 2, 3},
-                new double[] {4, 5, 6},
-                new double[] {7, 8, 9}
+        BigDecimal[][] matrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(4).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(6).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(7).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(8).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(9).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        double[][] actualResultMatrix = removeVectorFromMatrix(matrix, 0);
-        double[][] expectedResultMatrix = new double[][] {
-                new double[] {4, 5, 6},
-                new double[] {7, 8, 9}
+        BigDecimal[][] actualResultMatrix = removeVectorFromMatrix(matrix, 0);
+        BigDecimal[][] expectedResultMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(4).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(6).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(7).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(8).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(9).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
         assertMatrixEquals(expectedResultMatrix, actualResultMatrix);
@@ -133,29 +228,49 @@ class VectorUtilTest {
 
     @Test
     void testRemoveLastVectorFromMatrix() {
-        double[][] matrix = new double[][] {
-                new double[] {1, 2, 3},
-                new double[] {4, 5, 6},
-                new double[] {7, 8, 9}
+        BigDecimal[][] matrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(4).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(6).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(7).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(8).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(9).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        double[][] actualResultMatrix = removeVectorFromMatrix(matrix, 2);
-        double[][] expectedResultMatrix = new double[][] {
-                new double[] {1, 2, 3},
-                new double[] {4, 5, 6}
+        BigDecimal[][] actualResultMatrix = removeVectorFromMatrix(matrix, 2);
+        BigDecimal[][] expectedResultMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(2).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(3).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(4).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(5).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(6).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
         assertMatrixEquals(expectedResultMatrix, actualResultMatrix);
     }
 
-    private void assertMatrixEquals(double[][] expectedMatrix, double[][] actualMatrix) {
+    private void assertMatrixEquals(BigDecimal[][] expectedMatrix, BigDecimal[][] actualMatrix) {
         assertEquals(expectedMatrix.length, actualMatrix.length);
         for (int i = 0; i < expectedMatrix.length; i++) {
             assertVectorsEquals(expectedMatrix[i], actualMatrix[i]);
         }
     }
 
-    private void assertVectorsEquals(double[] expectedVector, double[] actualVector) {
+    private void assertVectorsEquals(BigDecimal[] expectedVector, BigDecimal[] actualVector) {
         assertEquals(expectedVector.length, actualVector.length);
         for (int i = 0; i < expectedVector.length; i++) {
             assertEquals(expectedVector[i], actualVector[i]);

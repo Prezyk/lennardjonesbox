@@ -1,9 +1,11 @@
 package com.prezyk.md.model;
 
-public interface MotionModel {
-    double[][] calculateNextAcceleration(double[][] nextPositionsMatrix);
+import java.math.BigDecimal;
 
-    double calculatePotentialEnergy(double[][] positionsMatrix);
+public interface MotionModel {
+    BigDecimal[][] calculateNextAcceleration(BigDecimal[][] nextPositionsMatrix);
+
+    BigDecimal calculatePotentialEnergy(BigDecimal[][] positionsMatrix);
 
     String getPotentialEnergyKey();
 }

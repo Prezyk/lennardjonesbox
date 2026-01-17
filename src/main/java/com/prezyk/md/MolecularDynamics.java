@@ -5,6 +5,7 @@ import com.prezyk.md.model.LennardJonesModel;
 import com.prezyk.md.state.BoxState;
 import com.prezyk.md.state.MoleculeState;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
@@ -25,7 +26,7 @@ public class MolecularDynamics {
         integrator.registerModel(new LennardJonesModel(simulationInput.getEpsilon(), simulationInput.getMass(), simulationInput.getSigma()));
         integrator.registerModel(new ElasticBoxModel(simulationInput.getWallStiffness(), simulationInput.getBoxSize(), simulationInput.getMass()));
         currentBoxState = integrator.calculateNextBoxState(currentMoleculesStates, simulationInput.getMass());
-        simulation.setState(0, 0, currentBoxState, Arrays.stream(currentMoleculesStates)
+        simulation.setState(0, BigDecimal.ZERO, currentBoxState, Arrays.stream(currentMoleculesStates)
                                                                                                            .map(MoleculeState::clone)
                                                                                                            .toArray(MoleculeState[]::new));
     }
@@ -38,13 +39,13 @@ public class MolecularDynamics {
     }
 
     public Simulation calculateSimulation() {
-        double currentTime = 0;
+        BigDecimal currentTime = BigDecimal.ZERO;
         for (int i = 0; i < simulationInput.getTimeStepsAmount(); i++) {
             simulation.setState(i, currentTime, currentBoxState, Arrays.stream(currentMoleculesStates)
                                                                                                       .map(MoleculeState::clone)
                                                                                                       .toArray(MoleculeState[]::new));
             verletStep();
-            currentTime += simulationInput.getTimeStep();
+            currentTime = currentTime.add(simulationInput.getTimeStep());
         }
         return simulation;
     }

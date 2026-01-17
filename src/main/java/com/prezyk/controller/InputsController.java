@@ -12,6 +12,7 @@ import javafx.stage.FileChooser;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.function.Function;
 
 public class InputsController {
@@ -142,22 +143,22 @@ public class InputsController {
     @FXML
     public void btnSimulateFunction() {
         SimulationInput simulationInput = readSimulationConditions();
-        double[] distanceVector = new double[(int)simulationInput.getBoxSize()];
-        for (int i = 0; i < simulationInput.getBoxSize(); i++) {
-            distanceVector[i] = i+2;
+        BigDecimal[] distanceVector = new BigDecimal[simulationInput.getBoxSize().intValue()];
+        for (int i = 0; i < simulationInput.getBoxSize().intValue(); i++) {
+            distanceVector[i] = BigDecimal.valueOf(i+2);
         }
         EventDispatcher.getInstance().dispatchEvent(new SimulationFunctionRunEvent(distanceVector, simulationInput));
     }
 
-    private Double getValidValue(TextField valueField, Label errorLabel) {
+    private BigDecimal getValidValue(TextField valueField, Label errorLabel) {
         return getValidValue(valueField, errorLabel, dummy -> Boolean.FALSE);
     }
 
-    private Double getValidValue(TextField valueField, Label errorLabel, Function<Double, Boolean> invalidityChecker) {
-        double value = -1.;
+    private BigDecimal getValidValue(TextField valueField, Label errorLabel, Function<BigDecimal, Boolean> invalidityChecker) {
+        BigDecimal value = BigDecimal.ZERO;
         try {
             errorLabel.setVisible(false);
-            value = Double.parseDouble(valueField.getText());
+            value = BigDecimal.valueOf(Double.parseDouble(valueField.getText()));
             if (invalidityChecker.apply(value))
                 throw new IllegalArgumentException();
 
@@ -170,15 +171,15 @@ public class InputsController {
 
     private SimulationInput readSimulationConditions() {
         return SimulationInput.builder()
-                              .time(getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> timeToValidate <= 0))
-                              .timeStep(getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> stepToValidate <= 0 || stepToValidate > 0.05))
+                              .time(getValidValue(txtTime, labelInvalidTime, (timeToValidate) -> timeToValidate.compareTo(BigDecimal.ZERO) <= 0))
+                              .timeStep(getValidValue(txtStep, labelInvalidStep, (stepToValidate) -> (stepToValidate.compareTo(BigDecimal.ZERO) <= 0) || (stepToValidate.compareTo(BigDecimal.valueOf(0.05)) > 0)))
                               .moleculeRadius(getValidValue(txtR0, labelInvalidR0))
                               .epsilon(getValidValue(txtEps, labelInvalidEps))
-                              .mass(getValidValue(txtMass, labelInvalidMass, massToValidate -> massToValidate <= 0))
-                              .moleculesQuantity(getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate <= 0 || (moleculesToValidate - moleculesToValidate.intValue()) > 0).intValue())
-                              .boxSize(getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate <= 0))
-                              .wallStiffness(getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate <= 0))
-                .sigma(getValidValue(txtSigma, labelInvalidSigma, sigmaToValidate -> sigmaToValidate <= 0))
+                              .mass(getValidValue(txtMass, labelInvalidMass, massToValidate -> massToValidate.compareTo(BigDecimal.ZERO) <= 0))
+                              .moleculesQuantity(getValidValue(txtMolecules, labelInvalidMolecules, moleculesToValidate -> moleculesToValidate.compareTo(BigDecimal.ZERO) <= 0).intValue())
+                              .boxSize(getValidValue(txtBoxSize, labelInvalidMass, massToValidate -> massToValidate.compareTo(BigDecimal.ZERO) <= 0))
+                              .wallStiffness(getValidValue(txtWallStiffness, labelInvalidWallStiffness, wallStiffnessToValidate -> wallStiffnessToValidate.compareTo(BigDecimal.ZERO) <= 0))
+                .sigma(getValidValue(txtSigma, labelInvalidSigma, sigmaToValidate -> sigmaToValidate.compareTo(BigDecimal.ZERO)<= 0))
                               .build();
     }
 }

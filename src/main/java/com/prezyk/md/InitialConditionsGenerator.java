@@ -2,6 +2,7 @@ package com.prezyk.md;
 
 import com.prezyk.md.state.MoleculeState;
 
+import java.math.BigDecimal;
 import java.util.Random;
 
 public class InitialConditionsGenerator {
@@ -22,31 +23,42 @@ public class InitialConditionsGenerator {
         return initialStates;
     }
 
-    private double[] generateInitialPosition() {
+    private BigDecimal[] generateInitialPosition() {
         Random random = new Random();
-        return new double[] {
-                random.nextDouble() * (getUpperPositionBound() - getLowerPositionBound()) + getLowerPositionBound(),
-                random.nextDouble() * (getUpperPositionBound() - getLowerPositionBound()) + getLowerPositionBound(),
+        return new BigDecimal[] {
+                BigDecimal.valueOf(random.nextDouble())
+                          .multiply(getUpperPositionBound().subtract(getLowerPositionBound()))
+                          .add(getLowerPositionBound()),
+                BigDecimal.valueOf(random.nextDouble())
+                          .multiply(getUpperPositionBound().subtract(getLowerPositionBound()))
+                          .add(getLowerPositionBound()),
         };
     }
 
-    private double getLowerPositionBound() {
-        return simulationInput.getMoleculeRadius() * 2;
+    private BigDecimal getLowerPositionBound() {
+        return simulationInput.getMoleculeRadius()
+                              .multiply(BigDecimal.valueOf(2));
     }
 
-    private double getUpperPositionBound() {
-        return simulationInput.getBoxSize() - simulationInput.getMoleculeRadius() * 2;
+    private BigDecimal getUpperPositionBound() {
+        return simulationInput.getBoxSize()
+                              .subtract(simulationInput.getMoleculeRadius())
+                              .multiply(BigDecimal.valueOf(2));
     }
 
-    private double[] generateInitialVelocity() {
+    private BigDecimal[] generateInitialVelocity() {
         Random random = new Random();
-        return new double[] {
-                random.nextDouble() * 4 - 2,
-                random.nextDouble() * 4 - 2,
+        return new BigDecimal[] {
+                BigDecimal.valueOf(random.nextDouble())
+                          .multiply(BigDecimal.valueOf(4))
+                          .subtract(BigDecimal.valueOf(2)),
+                BigDecimal.valueOf(random.nextDouble())
+                          .multiply(BigDecimal.valueOf(4))
+                          .subtract(BigDecimal.valueOf(2)),
         };
     }
 
-    private double[] generateInitialAcceleration() {
-        return new double[] {0, 0};
+    private BigDecimal[] generateInitialAcceleration() {
+        return new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO};
     }
 }

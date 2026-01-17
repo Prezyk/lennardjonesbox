@@ -1,43 +1,44 @@
 package com.prezyk.md.state;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 
 public class BoxState {
-    private final double kineticEnergy;
-    private final HashMap<String, Double> potentialEnergies;
+    private final BigDecimal kineticEnergy;
+    private final HashMap<String, BigDecimal> potentialEnergies;
 
-    public BoxState(double kineticEnergy) {
+    public BoxState(BigDecimal kineticEnergy) {
         this.kineticEnergy = kineticEnergy;
         this.potentialEnergies = new HashMap<>();
     }
 
-    private BoxState(double kineticEnergy, HashMap<String, Double> potentialEnergies) {
+    private BoxState(BigDecimal kineticEnergy, HashMap<String, BigDecimal> potentialEnergies) {
         this.kineticEnergy = kineticEnergy;
         this.potentialEnergies = potentialEnergies;
     }
 
-    public double getKineticEnergy() {
+    public BigDecimal getKineticEnergy() {
         return kineticEnergy;
     }
 
 
-    public double getTotalEnergy() {
-        return kineticEnergy + getTotalPotentialEnergy();
+    public BigDecimal getTotalEnergy() {
+        return kineticEnergy.add(getTotalPotentialEnergy());
     }
 
-    private double getTotalPotentialEnergy() {
-        return potentialEnergies.values().stream().mapToDouble(Double::valueOf).sum();
+    private BigDecimal getTotalPotentialEnergy() {
+        return potentialEnergies.values().stream().reduce(BigDecimal::add).get();
     }
 
     public BoxState clone() {
-        return new BoxState(kineticEnergy, (HashMap<String, Double>) potentialEnergies.clone());
+        return new BoxState(kineticEnergy, (HashMap<String, BigDecimal>) potentialEnergies.clone());
     }
 
-    public double getPotentialEnergy(String key) {
+    public BigDecimal getPotentialEnergy(String key) {
         return potentialEnergies.get(key);
     }
 
-    public void putPotentialEnergy(String key, Double energy) {
+    public void putPotentialEnergy(String key, BigDecimal energy) {
         this.potentialEnergies.put(key, energy);
     }
 

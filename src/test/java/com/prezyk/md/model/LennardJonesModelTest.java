@@ -2,100 +2,175 @@ package com.prezyk.md.model;
 
 import org.junit.jupiter.api.Test;
 
-import static com.prezyk.util.Assertions.assertDoubleMatrixEquals;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import static com.prezyk.util.Assertions.assertBigDecimalMatrixEquals;
+import static com.prezyk.util.CalculationPrecision.PRECISION;
 
 class LennardJonesModelTest {
 
-    private static final double MASS_NOT_RELEVANT = 0.;
+    private static final int BIG_DECIMAL_SCALE = 100;
 
     @Test
     public void textNextAccelerationsBasic() {
-        double[][] nextPositionsMatrix = new double[][] {
-                new double[] {0.5, -0.5},
-                new double[] {-0.5, 0.5}
+        BigDecimal[][] nextPositionsMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(0.5).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(-0.5).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-0.5).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(0.5).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        LennardJonesModel model = new LennardJonesModel(1, 1, 1);
-        double[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
+        LennardJonesModel model = new LennardJonesModel(BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP));
+        BigDecimal[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
 
-        double[][] expectedNextAccelerations = new double[][] {
-                new double[] {24, -24},
-                new double[] {-24, 24}
+        BigDecimal[][] expectedNextAccelerations = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(24).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(-24).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-24).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(24).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        assertDoubleMatrixEquals(expectedNextAccelerations, actualNextAccelerations);
+        assertBigDecimalMatrixEquals(expectedNextAccelerations, actualNextAccelerations, BIG_DECIMAL_SCALE);
     }
 
     @Test
     public void textNextAccelerationsEpsDiffThanOne() {
-        double[][] nextPositionsMatrix = new double[][] {
-                new double[] {0, 0},
-                new double[] {-1, 1}
+        BigDecimal[][] nextPositionsMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(0).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(0).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        LennardJonesModel model = new LennardJonesModel(0.5, 1, 1);
-        double[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
+        LennardJonesModel model = new LennardJonesModel(BigDecimal.valueOf(0.5).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP)
+        );
+        BigDecimal[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
 
-        double[][] expectedNextAccelerations = new double[][] {
-                new double[] {12, -12},
-                new double[] {-12, 12}
+        BigDecimal[][] expectedNextAccelerations = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(12).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(-12).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-12).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(12).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        assertDoubleMatrixEquals(expectedNextAccelerations, actualNextAccelerations);
+        assertBigDecimalMatrixEquals(expectedNextAccelerations, actualNextAccelerations, BIG_DECIMAL_SCALE);
     }
 
     @Test
     public void textNextAccelerationsDistanceOtherThanOne() {
-        double[][] nextPositionsMatrix = new double[][] {
-                new double[] {-0.15, 0.62},
-                new double[] {-0.65, 0.12}
+        BigDecimal[][] nextPositionsMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-0.15).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(0.62).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-0.65).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(0.12).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        LennardJonesModel model = new LennardJonesModel(1, 1, 1);
-        double[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
+        LennardJonesModel model = new LennardJonesModel(BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP));
+        BigDecimal[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
 
-        double[][] expectedNextAccelerations = new double[][] {
-                new double[] {390144, 390144},
-                new double[] {-390144, -390144}
+        BigDecimal[][] expectedNextAccelerations = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(390144).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(390144).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-390144).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(-390144).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        assertDoubleMatrixEquals(expectedNextAccelerations, actualNextAccelerations);
+        assertBigDecimalMatrixEquals(expectedNextAccelerations, actualNextAccelerations, BIG_DECIMAL_SCALE);
     }
 
     @Test
     public void textNextAccelerationsSigmaOtherThanOne() {
-        double[][] nextPositionsMatrix = new double[][] {
-                new double[] {0, 0},
-                new double[] {1, 1}
+        BigDecimal[][] nextPositionsMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(0).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(0).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        LennardJonesModel model = new LennardJonesModel(1, 1, 0.5);
-        double[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
+        LennardJonesModel model = new LennardJonesModel(BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(0.5).setScale(PRECISION, RoundingMode.HALF_UP));
+        BigDecimal[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
 
-        double[][] expectedNextAccelerations = new double[][] {
-                new double[] {0.36328125, 0.36328125},
-                new double[] {-0.36328125, -0.36328125}
+        BigDecimal[][] expectedNextAccelerations = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(0.36328125).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(0.36328125).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-0.36328125).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(-0.36328125).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        assertDoubleMatrixEquals(expectedNextAccelerations, actualNextAccelerations);
+        assertBigDecimalMatrixEquals(expectedNextAccelerations, actualNextAccelerations, BIG_DECIMAL_SCALE);
     }
 
     @Test
     public void textNextAccelerationsMassOtherThanOne() {
-        double[][] nextPositionsMatrix = new double[][] {
-                new double[] {0, 0},
-                new double[] {1, 1}
+        BigDecimal[][] nextPositionsMatrix = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(0).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(0).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        LennardJonesModel model = new LennardJonesModel(1, 0.5, 1);
-        double[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
+        LennardJonesModel model = new LennardJonesModel(BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(0.5).setScale(PRECISION, RoundingMode.HALF_UP),
+                                                        BigDecimal.valueOf(1).setScale(PRECISION, RoundingMode.HALF_UP));
+        BigDecimal[][] actualNextAccelerations = model.calculateNextAcceleration(nextPositionsMatrix);
 
-        double[][] expectedNextAccelerations = new double[][] {
-                new double[] {-48, -48},
-                new double[] {48, 48}
+        BigDecimal[][] expectedNextAccelerations = new BigDecimal[][] {
+                new BigDecimal[] {
+                        BigDecimal.valueOf(-48).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(-48).setScale(PRECISION, RoundingMode.HALF_UP)
+                },
+                new BigDecimal[] {
+                        BigDecimal.valueOf(48).setScale(PRECISION, RoundingMode.HALF_UP),
+                        BigDecimal.valueOf(48).setScale(PRECISION, RoundingMode.HALF_UP)
+                }
         };
 
-        assertDoubleMatrixEquals(expectedNextAccelerations, actualNextAccelerations);
+        assertBigDecimalMatrixEquals(expectedNextAccelerations, actualNextAccelerations, BIG_DECIMAL_SCALE);
     }
 
     //TODO non testable due to rounding - need to migrate to BigDecimal first

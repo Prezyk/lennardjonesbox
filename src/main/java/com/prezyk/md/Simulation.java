@@ -3,18 +3,19 @@ package com.prezyk.md;
 import com.prezyk.md.state.BoxState;
 import com.prezyk.md.state.MoleculeState;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class Simulation {
 
-    private final double[] time;
+    private final BigDecimal[] time;
     private final Molecule[] molecules;
     private final Box box;
-    private final double epsilon;
+    private final BigDecimal epsilon;
 
     public Simulation(SimulationInput simulationInput) {
         this.epsilon = simulationInput.getEpsilon();
-        this.time = new double[simulationInput.getTimeStepsAmount()];
+        this.time = new BigDecimal[simulationInput.getTimeStepsAmount()];
         this.box = new Box(simulationInput.getBoxSize(), simulationInput.getWallStiffness(), simulationInput.getTimeStepsAmount());
         this.molecules = new Molecule[simulationInput.getMoleculesQuantity()];
         for (int i = 0; i < this.molecules.length; i++) {
@@ -26,7 +27,7 @@ public class Simulation {
         return molecules.length;
     }
 
-    public void setState(int timePoint, double time, BoxState boxState, MoleculeState[] moleculesStates) {
+    public void setState(int timePoint, BigDecimal time, BoxState boxState, MoleculeState[] moleculesStates) {
         this.time[timePoint] = time;
         this.box.setState(timePoint, boxState);
         this.setMoleculesStates(timePoint, moleculesStates);
@@ -38,41 +39,41 @@ public class Simulation {
         }
     }
 
-    public double[] getTime() {
+    public BigDecimal[] getTime() {
         return time;
     }
 
-    public double getDuration() {
-        return time[time.length - 1] - time[0];
+    public BigDecimal getDuration() {
+        return time[time.length - 1].subtract(time[0]);
     }
 
     public int getTimePoints() {
         return time.length;
     }
 
-    public double[][][] getPositionVectors() {
+    public BigDecimal[][][] getPositionVectors() {
         return Arrays.stream(this.molecules)
                                  .map(Molecule::getPositionVectorSeries)
-                                 .toArray(double[][][]::new);
+                                 .toArray(BigDecimal[][][]::new);
     }
 
-    public Double[] getKineticEnergySeries() {
+    public BigDecimal[] getKineticEnergySeries() {
         return this.box.getKineticEnergySeries();
     }
 
-    public Double[] getPotentialEnergySeries() {
+    public BigDecimal[] getPotentialEnergySeries() {
         return this.box.getPotentialEnergySeries();
     }
 
-    public Double[] getBoxElasticEnergySeries() {
+    public BigDecimal[] getBoxElasticEnergySeries() {
         return this.box.getElasticEnergySeries();
     }
 
-    public double getBoxSize() {
+    public BigDecimal getBoxSize() {
         return this.box.getSize();
     }
 
-    public Double[] getTotalEnergySeries() {
+    public BigDecimal[] getTotalEnergySeries() {
         return this.box.getTotalEnergySeries();
     }
 }

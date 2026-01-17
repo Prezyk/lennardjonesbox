@@ -1,29 +1,31 @@
 package com.prezyk.md.state;
 
+import java.math.BigDecimal;
+
 import static com.prezyk.util.VectorUtil.copyVector;
 
 public class MoleculeState {
-    private final double[] positionVector;
-    private final double[] velocityVector;
-    private final double[] accelerationVector;
+    private final BigDecimal[] positionVector;
+    private final BigDecimal[] velocityVector;
+    private final BigDecimal[] accelerationVector;
 
-    public MoleculeState(double[] positionVector,
-                         double[] velocityVector,
-                         double[] accelerationVector) {
+    public MoleculeState(BigDecimal[] positionVector,
+                         BigDecimal[] velocityVector,
+                         BigDecimal[] accelerationVector) {
         this.positionVector = copyVector(positionVector);
         this.velocityVector = copyVector(velocityVector);
         this.accelerationVector = copyVector(accelerationVector);
     }
 
-    public double[] getPositionVector() {
+    public BigDecimal[] getPositionVector() {
         return positionVector;
     }
 
-    public double[] getVelocityVector() {
+    public BigDecimal[] getVelocityVector() {
         return velocityVector;
     }
 
-    public double[] getAccelerationVector() {
+    public BigDecimal[] getAccelerationVector() {
         return accelerationVector;
     }
 

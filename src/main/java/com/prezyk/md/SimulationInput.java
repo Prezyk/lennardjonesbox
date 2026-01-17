@@ -1,17 +1,20 @@
 package com.prezyk.md;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class SimulationInput {
     private final int moleculesQuantity;
-    private final double moleculeRadius;
-    private final double epsilon;
-    private final double mass;
-    private final double time;
-    private final double timeStep;
-    private final double boxSize;
-    private final double wallStiffness;
-    private final double sigma;
+    private final BigDecimal moleculeRadius;
+    private final BigDecimal epsilon;
+    private final BigDecimal mass;
+    private final BigDecimal time;
+    private final BigDecimal timeStep;
+    private final BigDecimal boxSize;
+    private final BigDecimal wallStiffness;
+    private final BigDecimal sigma;
 
-    private SimulationInput(int moleculesQuantity, double moleculeRadius, double epsilon, double mass, double time, double timeStep, double boxSize, double wallStiffness, double sigma) {
+    private SimulationInput(int moleculesQuantity, BigDecimal moleculeRadius, BigDecimal epsilon, BigDecimal mass, BigDecimal time, BigDecimal timeStep, BigDecimal boxSize, BigDecimal wallStiffness, BigDecimal sigma) {
         this.moleculesQuantity = moleculesQuantity;
         this.moleculeRadius = moleculeRadius;
         this.epsilon = epsilon;
@@ -29,14 +32,14 @@ public class SimulationInput {
 
     public static class Builder {
         int moleculesQuantity;
-        double moleculeRadius;
-        double epsilon;
-        double mass;
-        double time;
-        double timeStep;
-        double boxSize;
-        double wallStiffness;
-        double sigma;
+        BigDecimal moleculeRadius;
+        BigDecimal epsilon;
+        BigDecimal mass;
+        BigDecimal time;
+        BigDecimal timeStep;
+        BigDecimal boxSize;
+        BigDecimal wallStiffness;
+        BigDecimal sigma;
 
         private Builder() {}
 
@@ -45,42 +48,42 @@ public class SimulationInput {
             return this;
         }
 
-        public Builder moleculeRadius(double moleculeRadius) {
+        public Builder moleculeRadius(BigDecimal moleculeRadius) {
             this.moleculeRadius = moleculeRadius;
             return this;
         }
 
-        public Builder epsilon(double epsilon) {
+        public Builder epsilon(BigDecimal epsilon) {
             this.epsilon = epsilon;
             return this;
         }
 
-        public Builder mass(double mass) {
+        public Builder mass(BigDecimal mass) {
             this.mass = mass;
             return this;
         }
 
-        public Builder time(double time) {
+        public Builder time(BigDecimal time) {
             this.time = time;
             return this;
         }
 
-        public Builder timeStep(double timeStep) {
+        public Builder timeStep(BigDecimal timeStep) {
             this.timeStep = timeStep;
             return this;
         }
 
-        public Builder boxSize(double boxSize) {
+        public Builder boxSize(BigDecimal boxSize) {
             this.boxSize = boxSize;
             return this;
         }
 
-        public Builder wallStiffness(double wallStiffness) {
+        public Builder wallStiffness(BigDecimal wallStiffness) {
             this.wallStiffness = wallStiffness;
             return this;
         }
 
-        public Builder sigma(double sigma) {
+        public Builder sigma(BigDecimal sigma) {
             this.sigma = sigma;
             return this;
         }
@@ -102,39 +105,39 @@ public class SimulationInput {
         return moleculesQuantity;
     }
 
-    public double getMoleculeRadius() {
+    public BigDecimal getMoleculeRadius() {
         return moleculeRadius;
     }
 
-    public double getEpsilon() {
+    public BigDecimal getEpsilon() {
         return epsilon;
     }
 
-    public double getMass() {
+    public BigDecimal getMass() {
         return mass;
     }
 
-    public double getTime() {
+    public BigDecimal getTime() {
         return time;
     }
 
-    public double getTimeStep() {
+    public BigDecimal getTimeStep() {
         return timeStep;
     }
 
-    public double getBoxSize() {
+    public BigDecimal getBoxSize() {
         return boxSize;
     }
 
-    public double getWallStiffness() {
+    public BigDecimal getWallStiffness() {
         return wallStiffness;
     }
 
     public int getTimeStepsAmount() {
-        return (int) Math.floor(time / timeStep);
+        return time.divide(timeStep, RoundingMode.HALF_UP).intValue();
     }
 
-    public double getSigma() {
+    public BigDecimal getSigma() {
         return sigma;
     }
 }

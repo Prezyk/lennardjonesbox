@@ -1,94 +1,98 @@
 package com.prezyk.util;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class VectorUtil {
 
-    public static double[] copyVector(double[] sourceVector) throws VectorSizeException {
+    public static BigDecimal[] copyVector(BigDecimal[] sourceVector) throws VectorSizeException {
         validateVectorSizeNonZeroOrThrow(sourceVector);
-        double[] targetVector = new double[sourceVector.length];
+        BigDecimal[] targetVector = new BigDecimal[sourceVector.length];
         System.arraycopy(sourceVector, 0, targetVector, 0, targetVector.length);
         return targetVector;
     }
 
-    public static double sumVectorElements(double[] vector) {
+    public static BigDecimal sumVectorElements(BigDecimal[] vector) {
         validateVectorSizeNonZeroOrThrow(vector);
-        return vectorToScalarOperation(vector, Double::sum);
+        return vectorToScalarOperation(vector, BigDecimal::add);
     }
 
-    public static double[] divideVector(double[] vector, double scalar) {
+    public static BigDecimal[] divideVector(BigDecimal[] vector, BigDecimal scalar) {
         validateVectorSizeNonZeroOrThrow(vector);
-        return operateOnVector(vector, scalar, (vectorElement, scalarElement) -> vectorElement / scalarElement);
+        return operateOnVector(vector, scalar, (vectorElement, scalarElement) -> vectorElement.divide(scalarElement, RoundingMode.HALF_UP));
     }
 
-    public static double[] multiplyVector(double[] vector, double scalar) {
+    public static BigDecimal[] multiplyVector(BigDecimal[] vector, BigDecimal scalar) {
         validateVectorSizeNonZeroOrThrow(vector);
-        return operateOnVector(vector, scalar, (vectorElement, scalarElement) -> vectorElement * scalarElement);
+        return operateOnVector(vector, scalar, BigDecimal::multiply);
     }
 
-    public static double[] subtractVectors(double[] leftVector, double[] rightVector) {
+    public static BigDecimal[] subtractVectors(BigDecimal[] leftVector, BigDecimal[] rightVector) {
         validateVectorSizeSameOrThrow(leftVector, rightVector);
-        return operateOnVectors(leftVector, rightVector, (leftVectorElement, rightVectorElement) -> leftVectorElement - rightVectorElement);
+        return operateOnVectors(leftVector, rightVector, BigDecimal::subtract);
     }
 
-    public static double[] divideScalarByVector(double scalar, double[] vector) {
+    public static BigDecimal[] divideScalarByVector(BigDecimal scalar, BigDecimal[] vector) {
         validateVectorSizeNonZeroOrThrow(vector);
-        return operateOnVector(vector, scalar, (vectorElement, scalarElement) -> scalarElement / vectorElement);
+        return operateOnVector(vector, scalar, (vectorElement, scalarElement) -> scalarElement.divide(vectorElement, RoundingMode.HALF_UP));
     }
 
-    public static double[] vectorPowerScalar(double[] vector, double scalar) {
+    public static BigDecimal[] vectorPowerScalar(BigDecimal[] vector, BigDecimal scalar) {
         validateVectorSizeNonZeroOrThrow(vector);
-        return operateOnVector(vector, scalar, Math::pow);
+        return operateOnVector(vector, scalar, (element, powerValue) -> element.pow(powerValue.intValue()));
     }
 
-    public static double vectorLength(double[] vector) {
-        return Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2));
+    public static BigDecimal vectorLength(BigDecimal[] vector) {
+        return (vector[0].pow(2).add(vector[1].pow(2))).sqrt(MathContext.UNLIMITED);
     }
 
-    public static double[] matrixVectorLengths(double[][] matrix) {
+    public static BigDecimal[] matrixVectorLengths(BigDecimal[][] matrix) {
         validateMatrixLengthNonZeroOrThrow(matrix);
         return matrixToVectorsOperation(matrix, VectorUtil::vectorLength);
     }
 
-    public static double[][] addMatrices(double[][] leftMatrix, double[][] rightMatrix) {
+    public static BigDecimal[][] addMatrices(BigDecimal[][] leftMatrix, BigDecimal[][] rightMatrix) {
         validateMatricesSizeSameOrThrow(leftMatrix, rightMatrix);
-        return operateOnMatrices(leftMatrix, rightMatrix, Double::sum);
+        return operateOnMatrices(leftMatrix, rightMatrix, BigDecimal::add);
     }
 
-    public static double[][] subtractMatrices(double[][] leftMatrix, double[][] rightMatrix) {
+    public static BigDecimal[][] subtractMatrices(BigDecimal[][] leftMatrix, BigDecimal[][] rightMatrix) {
         validateMatricesSizeSameOrThrow(leftMatrix, rightMatrix);
-        return operateOnMatrices(leftMatrix, rightMatrix, (leftMatrixElement, rightMatrixElement) -> leftMatrixElement - rightMatrixElement);
+        return operateOnMatrices(leftMatrix, rightMatrix, BigDecimal::subtract);
     }
 
-    public static double[][] multiplyMatrix(double[][] matrix, double scalar) {
+    public static BigDecimal[][] multiplyMatrix(BigDecimal[][] matrix, BigDecimal scalar) {
         validateMatrix(matrix);
-        return operateOnMatrix(matrix, scalar, (matrixElement, scalarElement) -> matrixElement * scalarElement);
+        return operateOnMatrix(matrix, scalar, BigDecimal::multiply);
     }
 
-    public static double[][] matrixPowerScalar(double[][] matrix, double scalar) {
+    public static BigDecimal[][] matrixPowerScalar(BigDecimal[][] matrix, BigDecimal scalar) {
         validateMatrix(matrix);
-        return operateOnMatrix(matrix, scalar, Math::pow);
+        return operateOnMatrix(matrix, scalar, (element, powerValue) -> element.pow(powerValue.intValue()));
     }
 
-    public static double[][] divideScalarByMatrix(double scalar, double[][] matrix) {
+    public static BigDecimal[][] divideScalarByMatrix(BigDecimal scalar, BigDecimal[][] matrix) {
         validateMatrix(matrix);
-        return operateOnMatrix(matrix, scalar, (matrixElement, scalarElement) -> scalarElement / matrixElement);
+        return operateOnMatrix(matrix, scalar, (matrixElement, scalarElement) -> scalarElement.divide(matrixElement, RoundingMode.HALF_UP));
     }
 
-    public static double[] sumMatrixVectors(double[][] matrix) {
+    public static BigDecimal[] sumMatrixVectors(BigDecimal[][] matrix) {
         validateMatrix(matrix);
-        double[] resultVector = new double[matrix[0].length];
-        for (double[] vector: matrix) {
+        BigDecimal[] resultVector = initializeZeroVector(matrix[0].length);
+        for (BigDecimal[] vector: matrix) {
             for (int i = 0; i < vector.length; i++) {
-                resultVector[i] += vector[i];
+                resultVector[i] = resultVector[i].add(vector[i]);
             }
         }
         return resultVector;
     }
 
-    public static double[][] removeVectorFromMatrix(double[][] matrix, int vectorIndex) {
-        double[][] matrixWithoutVector = new double[matrix.length-1][];
+    public static BigDecimal[][] removeVectorFromMatrix(BigDecimal[][] matrix, int vectorIndex) {
+        BigDecimal[][] matrixWithoutVector = new BigDecimal[matrix.length-1][];
         if (vectorIndex == 0) {
             System.arraycopy(matrix, vectorIndex + 1, matrixWithoutVector, 0, matrix.length - 1);
         } else if (vectorIndex == matrix.length - 1) {
@@ -100,109 +104,115 @@ public class VectorUtil {
         return matrixWithoutVector;
     }
 
-    public static double[][] subtractVectorFromMatrix(double[][] matrix, double[] vector) {
+    public static BigDecimal[][] subtractVectorFromMatrix(BigDecimal[][] matrix, BigDecimal[] vector) {
         validateMatrix(matrix);
         validateVectorOfSizeOrThrow(vector, matrix[0].length);
-        return operateOnMatrixAndVector(matrix, vector, (matrixElement, vectorElement) -> matrixElement - vectorElement);
+        return operateOnMatrixAndVector(matrix, vector, BigDecimal::subtract);
     }
 
-    public static double[][] fillMatrixWithValue(double[][] matrix, double value) {
+    public static BigDecimal[][] fillMatrixWithValue(BigDecimal[][] matrix, BigDecimal value) {
         validateMatrix(matrix);
         return operateOnMatrix(matrix, value, (matrixElement, valueElement) -> valueElement);
     }
 
-    private static double[][] operateOnMatrixAndVector(double[][] matrix, double[] vector, BiFunction<Double, Double, Double> operation) {
-        double[][] resultMatrix = new double[matrix.length][];
+    private static BigDecimal[][] operateOnMatrixAndVector(BigDecimal[][] matrix, BigDecimal[] vector, BiFunction<BigDecimal, BigDecimal, BigDecimal> operation) {
+        BigDecimal[][] resultMatrix = new BigDecimal[matrix.length][];
         for (int i = 0; i < resultMatrix.length; i++) {
             resultMatrix[i] = operateOnVectors(matrix[i], vector, operation);
         }
         return resultMatrix;
     }
 
-    private static double[][] operateOnMatrices(double[][] leftMatrix, double[][] rightMatrix, BiFunction<Double, Double, Double> operation) {
-        double[][] resultMatrix = new double[leftMatrix.length][];
+    private static BigDecimal[][] operateOnMatrices(BigDecimal[][] leftMatrix, BigDecimal[][] rightMatrix, BiFunction<BigDecimal, BigDecimal, BigDecimal> operation) {
+        BigDecimal[][] resultMatrix = new BigDecimal[leftMatrix.length][];
         for (int i = 0; i < resultMatrix.length; i++) {
             resultMatrix[i] = operateOnVectors(leftMatrix[i], rightMatrix[i], operation);
         }
         return resultMatrix;
     }
 
-    private static double[] operateOnVectors(double[] leftVector, double[] rightVector, BiFunction<Double, Double, Double> operation) {
-        double[] resultVector = new double[leftVector.length];
+    private static BigDecimal[] operateOnVectors(BigDecimal[] leftVector, BigDecimal[] rightVector, BiFunction<BigDecimal, BigDecimal, BigDecimal> operation) {
+        BigDecimal[] resultVector = new BigDecimal[leftVector.length];
         for (int i = 0; i < resultVector.length; i++) {
             resultVector[i] = operation.apply(leftVector[i], rightVector[i]);
         }
         return resultVector;
     }
 
-    private static double[][] operateOnMatrix(double[][] matrix, double scalar, BiFunction<Double, Double, Double> operation) {
-        double[][] resultMatrix = new double[matrix.length][];
+    private static BigDecimal[][] operateOnMatrix(BigDecimal[][] matrix, BigDecimal scalar, BiFunction<BigDecimal, BigDecimal, BigDecimal> operation) {
+        BigDecimal[][] resultMatrix = new BigDecimal[matrix.length][];
         for(int i = 0; i < resultMatrix.length; i++) {
             resultMatrix[i] = operateOnVector(matrix[i], scalar, operation);
         }
         return resultMatrix;
     }
 
-    private static double[] operateOnVector(double[] vector, double scalar, BiFunction<Double, Double, Double> operation) {
-        double[] resultVector = new double[vector.length];
+    private static BigDecimal[] operateOnVector(BigDecimal[] vector, BigDecimal scalar, BiFunction<BigDecimal, BigDecimal, BigDecimal> operation) {
+        BigDecimal[] resultVector = new BigDecimal[vector.length];
         for (int i = 0; i < resultVector.length; i++) {
             resultVector[i] = operation.apply(vector[i], scalar);
         }
         return resultVector;
     }
 
-    private static double[] matrixToVectorsOperation(double[][] matrix, Function<double[], Double> operation) {
-        double[] resultVector = new double[matrix.length];
+    private static BigDecimal[] matrixToVectorsOperation(BigDecimal[][] matrix, Function<BigDecimal[], BigDecimal> operation) {
+        BigDecimal[] resultVector = new BigDecimal[matrix.length];
         for (int i = 0; i < resultVector.length; i++) {
             resultVector[i] = operation.apply(matrix[i]);
         }
         return resultVector;
     }
 
-    private static double vectorToScalarOperation(double[] vector, BiFunction<Double, Double, Double> operation) {
-        double resultScalar = 0.;
-        for (double vectorElement : vector) {
+    private static BigDecimal vectorToScalarOperation(BigDecimal[] vector, BiFunction<BigDecimal, BigDecimal, BigDecimal> operation) {
+        BigDecimal resultScalar = BigDecimal.ZERO;
+        for (BigDecimal vectorElement : vector) {
             resultScalar = operation.apply(resultScalar, vectorElement);
         }
         return resultScalar;
     }
 
-    private static void validateMatricesSizeSameOrThrow(double[][] leftMatrix, double[][] rightMatrix) {
+    private static void validateMatricesSizeSameOrThrow(BigDecimal[][] leftMatrix, BigDecimal[][] rightMatrix) {
         if (leftMatrix.length != rightMatrix.length) {
             throw VectorSizeException.matrixSizeMismatch(leftMatrix.length, rightMatrix.length);
         }
     }
 
-    private static void validateMatrix(double[][] matrix) {
+    private static void validateMatrix(BigDecimal[][] matrix) {
         validateMatrixLengthNonZeroOrThrow(matrix);
         int firstVectorSize = matrix[0].length;
-        for (double[] vector : matrix) {
+        for (BigDecimal[] vector : matrix) {
             validateVectorSizeNonZeroOrThrow(vector);
             validateVectorOfSizeOrThrow(vector, firstVectorSize);
         }
     }
 
-    private static void validateMatrixLengthNonZeroOrThrow(double[][] matrix) {
+    private static void validateMatrixLengthNonZeroOrThrow(BigDecimal[][] matrix) {
         if (matrix.length == 0) {
             throw VectorSizeException.matrixSizeZero();
         }
     }
 
-    private static void validateVectorSizeNonZeroOrThrow(double[] vector) {
+    private static void validateVectorSizeNonZeroOrThrow(BigDecimal[] vector) {
         if (vector.length == 0) {
             throw VectorSizeException.vectorSizeZero();
         }
     }
 
-    private static void validateVectorOfSizeOrThrow(double[] vector, int size) {
+    private static void validateVectorOfSizeOrThrow(BigDecimal[] vector, int size) {
         if (vector.length != size) {
             throw VectorSizeException.vectorSizeInvalid(vector.length, size);
         }
     }
 
-    private static void validateVectorSizeSameOrThrow(double[] leftVector, double[] rightVector) {
+    private static void validateVectorSizeSameOrThrow(BigDecimal[] leftVector, BigDecimal[] rightVector) {
         if (leftVector.length != rightVector.length) {
             throw VectorSizeException.vectorsSizeMismatch(leftVector.length, rightVector.length);
         }
+    }
+
+    private static BigDecimal[] initializeZeroVector(int length) {
+        BigDecimal[] vector = new BigDecimal[length];
+        Arrays.fill(vector, BigDecimal.ZERO);
+        return vector;
     }
 }

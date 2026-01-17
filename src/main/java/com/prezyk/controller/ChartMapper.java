@@ -2,6 +2,7 @@ package com.prezyk.controller;
 
 import com.prezyk.md.Simulation;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class ChartMapper {
     private static final String TOTAL_ENERGY = "Total E";
 
     private final Simulation simulation;
-    private final Map<String, Double[]> namedTimeSeries;
+    private final Map<String, BigDecimal[]> namedTimeSeries;
 
     public ChartMapper(Simulation simulation) {
         this.simulation = simulation;
@@ -26,11 +27,11 @@ public class ChartMapper {
         this.namedTimeSeries.put(TOTAL_ENERGY, simulation.getTotalEnergySeries());
     }
 
-    public double[] getTimePoints() {
+    public BigDecimal[] getTimePoints() {
         return simulation.getTime();
     }
 
-    public Double[] getTimeSeries(String timeSeriesName) {
+    public BigDecimal[] getTimeSeries(String timeSeriesName) {
         return namedTimeSeries.get(timeSeriesName);
     }
 

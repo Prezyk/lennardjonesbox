@@ -2,6 +2,7 @@ package com.prezyk.md;
 
 import com.prezyk.md.state.MoleculeState;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
@@ -9,11 +10,11 @@ import java.util.UUID;
 public class Molecule {
 
     private final String id;
-    private final double radius;
-    private final double mass;
+    private final BigDecimal radius;
+    private final BigDecimal mass;
     private final MoleculeState[] moleculeTimeStates;
 
-    public Molecule(double radius, double mass, int timePoints) {
+    public Molecule(BigDecimal radius, BigDecimal mass, int timePoints) {
         this.id = UUID.randomUUID()
                       .toString();
         this.radius = radius;
@@ -25,7 +26,7 @@ public class Molecule {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Molecule molecule = (Molecule) o;
-        return Double.compare(radius, molecule.radius) == 0 && Double.compare(mass, molecule.mass) == 0 && Objects.equals(id, molecule.id) && Objects.deepEquals(moleculeTimeStates, molecule.moleculeTimeStates);
+        return radius.compareTo(molecule.radius) == 0 && mass.compareTo(molecule.mass) == 0 && Objects.equals(id, molecule.id) && Objects.deepEquals(moleculeTimeStates, molecule.moleculeTimeStates);
     }
 
     @Override
@@ -33,22 +34,22 @@ public class Molecule {
         return Objects.hash(id, radius, mass, Arrays.hashCode(moleculeTimeStates));
     }
 
-    public double[][] getPositionVectorSeries() {
+    public BigDecimal[][] getPositionVectorSeries() {
         return Arrays.stream(moleculeTimeStates)
                      .map(MoleculeState::getPositionVector)
-                     .toArray(double[][]::new);
+                     .toArray(BigDecimal[][]::new);
     }
 
-    public double[][] getVelocityVectorSeries() {
+    public BigDecimal[][] getVelocityVectorSeries() {
         return Arrays.stream(moleculeTimeStates)
                      .map(MoleculeState::getVelocityVector)
-                     .toArray(double[][]::new);
+                     .toArray(BigDecimal[][]::new);
     }
 
-    public double[][] getAccelerationVectorSeries() {
+    public BigDecimal[][] getAccelerationVectorSeries() {
         return Arrays.stream(moleculeTimeStates)
                      .map(MoleculeState::getAccelerationVector)
-                     .toArray(double[][]::new);
+                     .toArray(BigDecimal[][]::new);
     }
 
     public void setState(int timePoint, MoleculeState moleculeTimeState) {

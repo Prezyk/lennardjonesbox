@@ -1,25 +1,27 @@
 package com.prezyk.md.model;
 
+import java.math.BigDecimal;
+
 public class ElasticBoxModel implements MotionModel {
 
     private static final int X_COORDINATE = 0;
     private static final int Y_COORDINATE = 1;
-    private static final double ELASTIC_INFLUENCE_THRESHOLD = 0.5;
+    private static final BigDecimal ELASTIC_INFLUENCE_THRESHOLD = new BigDecimal("0.5");
     public static final String POTENTIAL_ENERGY_KEY = "Elastic potential energy";
 
-    private final double wallStiffness;
-    private final double boxSize;
-    private final double moleculeMass;
+    private final BigDecimal wallStiffness;
+    private final BigDecimal boxSize;
+    private final BigDecimal moleculeMass;
 
-    public ElasticBoxModel(double wallStiffness, double boxSize, double moleculeMass) {
+    public ElasticBoxModel(BigDecimal wallStiffness, BigDecimal boxSize, BigDecimal moleculeMass) {
         this.wallStiffness = wallStiffness;
         this.boxSize = boxSize;
         this.moleculeMass = moleculeMass;
     }
 
     @Override
-    public double[][] calculateNextAcceleration(double[][] nextPositionsMatrix) {
-        double[][] accelerationMatrix = new double[nextPositionsMatrix.length][nextPositionsMatrix[0].length];
+    public BigDecimal[][] calculateNextAcceleration(BigDecimal[][] nextPositionsMatrix) {
+        BigDecimal[][] accelerationMatrix = new BigDecimal[nextPositionsMatrix.length][nextPositionsMatrix[0].length];
         for(int i = 0; i < accelerationMatrix.length; i++) {
             accelerationMatrix[i][X_COORDINATE] = calculateElasticAcceleration(i, X_COORDINATE, nextPositionsMatrix);
             accelerationMatrix[i][Y_COORDINATE] = calculateElasticAcceleration(i, Y_COORDINATE, nextPositionsMatrix);
@@ -27,14 +29,14 @@ public class ElasticBoxModel implements MotionModel {
         return accelerationMatrix;    }
 
     @Override
-    public double calculatePotentialEnergy(double[][] currentPositions) {
-        double elasticEnergy = 0.;
+    public BigDecimal calculatePotentialEnergy(BigDecimal[][] currentPositions) {
+        BigDecimal elasticEnergy = BigDecimal.ZERO;
         for (int i = 0; i < currentPositions.length; i++) {
-            elasticEnergy += calculateElasticEnergy(i, X_COORDINATE, currentPositions);
-            elasticEnergy += calculateElasticEnergy(i, Y_COORDINATE, currentPositions);
+            elasticEnergy = elasticEnergy.add(calculateElasticEnergy(i, X_COORDINATE, currentPositions));
+            elasticEnergy = elasticEnergy.add(calculateElasticEnergy(i, Y_COORDINATE, currentPositions));
         }
 
-        return elasticEnergy * moleculeMass;
+        return elasticEnergy.multiply(moleculeMass);
     }
 
     @Override
@@ -42,54 +44,58 @@ public class ElasticBoxModel implements MotionModel {
         return POTENTIAL_ENERGY_KEY;
     }
 
-    private double calculateElasticEnergy(int moleculeIndex, int coordinate, double[][] positionMatrix) {
+    private BigDecimal calculateElasticEnergy(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
         return calculateLowerBoundEnergyIfAround(moleculeIndex, coordinate, positionMatrix)
-                + calculateUpperBoundEnergyIfAround(moleculeIndex, coordinate, positionMatrix);
+                .add(calculateUpperBoundEnergyIfAround(moleculeIndex, coordinate, positionMatrix));
     }
 
-    private double calculateLowerBoundEnergyIfAround(int moleculeIndex, int coordinate, double[][] positionMatrix) {
-        double elasticEnergy = 0;
+    private BigDecimal calculateLowerBoundEnergyIfAround(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
+        BigDecimal elasticEnergy = BigDecimal.ZERO;
         if (isAroundLowerBound(moleculeIndex, coordinate, positionMatrix)) {
-            elasticEnergy = wallStiffness * 0.5 * Math.pow((ELASTIC_INFLUENCE_THRESHOLD - positionMatrix[moleculeIndex][coordinate]), 2);
+            elasticEnergy = wallStiffness.multiply(BigDecimal.valueOf(0.5))
+                                         .multiply(ELASTIC_INFLUENCE_THRESHOLD.subtract(positionMatrix[moleculeIndex][coordinate])
+                                                                              .pow(2));
         }
         return elasticEnergy;
     }
 
-    private double calculateUpperBoundEnergyIfAround(int moleculeIndex, int coordinate, double[][] positionMatrix) {
-        double elasticEnergy = 0;
+    private BigDecimal calculateUpperBoundEnergyIfAround(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
+        BigDecimal elasticEnergy = BigDecimal.ZERO;
         if (isAroundUpperBound(moleculeIndex, coordinate, positionMatrix)) {
-            elasticEnergy = wallStiffness  * 0.5 * Math.pow((boxSize - ELASTIC_INFLUENCE_THRESHOLD - positionMatrix[moleculeIndex][coordinate]), 2);
+            elasticEnergy = wallStiffness.multiply(BigDecimal.valueOf(0.5))
+                                         .multiply(boxSize.subtract(ELASTIC_INFLUENCE_THRESHOLD).subtract(positionMatrix[moleculeIndex][coordinate]).pow(2));
         }
         return elasticEnergy;
     }
 
 
-    private double calculateElasticAcceleration(int moleculeIndex, int coordinate, double[][] positionMatrix) {
-        return (calculateLowerBoundInfluenceIfAround(moleculeIndex, coordinate, positionMatrix)
-                + calculateUpperBoundInfluenceIfAround(moleculeIndex, coordinate, positionMatrix));
+    private BigDecimal calculateElasticAcceleration(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
+        return calculateLowerBoundInfluenceIfAround(moleculeIndex, coordinate, positionMatrix)
+                .add(calculateUpperBoundInfluenceIfAround(moleculeIndex, coordinate, positionMatrix));
     }
 
-    private double calculateLowerBoundInfluenceIfAround(int moleculeIndex, int coordinate, double[][] positionMatrix) {
-        double elasticAcceleration = 0;
+    private BigDecimal calculateLowerBoundInfluenceIfAround(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
+        BigDecimal elasticAcceleration = BigDecimal.ZERO;
         if (isAroundLowerBound(moleculeIndex, coordinate, positionMatrix)) {
-            elasticAcceleration = wallStiffness * (ELASTIC_INFLUENCE_THRESHOLD - positionMatrix[moleculeIndex][coordinate]);
+            elasticAcceleration = wallStiffness.multiply(ELASTIC_INFLUENCE_THRESHOLD.subtract(positionMatrix[moleculeIndex][coordinate]));
         }
         return elasticAcceleration;
     }
 
-    private double calculateUpperBoundInfluenceIfAround(int moleculeIndex, int coordinate, double[][] positionMatrix) {
-        double elasticAcceleration = 0;
+    private BigDecimal calculateUpperBoundInfluenceIfAround(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
+        BigDecimal elasticAcceleration = BigDecimal.ZERO;
         if (isAroundUpperBound(moleculeIndex, coordinate, positionMatrix)) {
-            elasticAcceleration = wallStiffness * (boxSize - ELASTIC_INFLUENCE_THRESHOLD - positionMatrix[moleculeIndex][coordinate]);
+            elasticAcceleration = wallStiffness.multiply(boxSize.subtract(ELASTIC_INFLUENCE_THRESHOLD)
+                                                                .subtract(positionMatrix[moleculeIndex][coordinate]));
         }
         return elasticAcceleration;
     }
 
-    private boolean isAroundLowerBound(int moleculeIndex, int coordinate, double[][] positionMatrix) {
-        return positionMatrix[moleculeIndex][coordinate] < ELASTIC_INFLUENCE_THRESHOLD;
+    private boolean isAroundLowerBound(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
+        return positionMatrix[moleculeIndex][coordinate].compareTo(ELASTIC_INFLUENCE_THRESHOLD) < 0;
     }
 
-    private boolean isAroundUpperBound(int moleculeIndex, int coordinate, double[][] positionMatrix) {
-        return positionMatrix[moleculeIndex][coordinate] > (boxSize - ELASTIC_INFLUENCE_THRESHOLD);
+    private boolean isAroundUpperBound(int moleculeIndex, int coordinate, BigDecimal[][] positionMatrix) {
+        return positionMatrix[moleculeIndex][coordinate].compareTo(boxSize.subtract(ELASTIC_INFLUENCE_THRESHOLD)) > 0;
     }
 }

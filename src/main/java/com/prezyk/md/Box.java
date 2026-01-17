@@ -4,14 +4,15 @@ import com.prezyk.md.model.ElasticBoxModel;
 import com.prezyk.md.model.LennardJonesModel;
 import com.prezyk.md.state.BoxState;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class Box {
-    private final double size;
-    private final double wallStiffness;
+    private final BigDecimal size;
+    private final BigDecimal wallStiffness;
     private final BoxState[] boxStates;
 
-    public Box(double size, double wallStiffness, int timePoints) {
+    public Box(BigDecimal size, BigDecimal wallStiffness, int timePoints) {
         this.size = size;
         this.wallStiffness = wallStiffness;
         this.boxStates = new BoxState[timePoints];
@@ -21,31 +22,31 @@ public class Box {
         this.boxStates[timePoint] = boxState;
     }
 
-    public double getSize() {
+    public BigDecimal getSize() {
         return size;
     }
 
-    public Double[] getKineticEnergySeries() {
+    public BigDecimal[] getKineticEnergySeries() {
         return Arrays.stream(boxStates)
                      .map(BoxState::getKineticEnergy)
-                     .toArray(Double[]::new);
+                     .toArray(BigDecimal[]::new);
     }
 
-    public Double[] getPotentialEnergySeries() {
+    public BigDecimal[] getPotentialEnergySeries() {
         return Arrays.stream(boxStates)
                      .map(boxState -> boxState.getPotentialEnergy(LennardJonesModel.POTENTIAL_ENERGY_KEY))
-                     .toArray(Double[]::new);
+                     .toArray(BigDecimal[]::new);
     }
 
-    public Double[] getElasticEnergySeries() {
+    public BigDecimal[] getElasticEnergySeries() {
         return Arrays.stream(boxStates)
                      .map(boxState -> boxState.getPotentialEnergy(ElasticBoxModel.POTENTIAL_ENERGY_KEY))
-                     .toArray(Double[]::new);
+                     .toArray(BigDecimal[]::new);
     }
 
-    public Double[] getTotalEnergySeries() {
+    public BigDecimal[] getTotalEnergySeries() {
         return Arrays.stream(boxStates)
                      .map(BoxState::getTotalEnergy)
-                     .toArray(Double[]::new);
+                     .toArray(BigDecimal[]::new);
     }
 }

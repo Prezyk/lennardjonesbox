@@ -1,43 +1,45 @@
 package com.prezyk.md.model;
 
+import java.math.BigDecimal;
+
 import static com.prezyk.util.VectorUtil.*;
 
 public class LennardJonesModel implements MotionModel {
     public static final String POTENTIAL_ENERGY_KEY = "LJ potential energy";
 
-    private final double epsilon;
-    private final double mass;
-    private final double sigma;
+    private final BigDecimal epsilon;
+    private final BigDecimal mass;
+    private final BigDecimal sigma;
 
-    public LennardJonesModel(double epsilon, double mass, double sigma) {
+    public LennardJonesModel(BigDecimal epsilon, BigDecimal mass, BigDecimal sigma) {
         this.epsilon = epsilon;
         this.mass = mass;
         this.sigma = sigma;
     }
 
     @Override
-    public double[][] calculateNextAcceleration(double[][] nextPositionsMatrix) {
-        double[][] accelerationMatrix = new double[nextPositionsMatrix.length][];
+    public BigDecimal[][] calculateNextAcceleration(BigDecimal[][] nextPositionsMatrix) {
+        BigDecimal[][] accelerationMatrix = new BigDecimal[nextPositionsMatrix.length][];
         for (int i = 0; i < nextPositionsMatrix.length; i++) {
-            double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, nextPositionsMatrix);
-            double[][] moleculeForces = calculateForcesForMolecule(relativeMoleculeDistances);
-            double[] resultantForce = calculateResultantForceForMolecule(moleculeForces);
+            BigDecimal[][] relativeMoleculeDistances = calculateMoleculeDistances(i, nextPositionsMatrix);
+            BigDecimal[][] moleculeForces = calculateForcesForMolecule(relativeMoleculeDistances);
+            BigDecimal[] resultantForce = calculateResultantForceForMolecule(moleculeForces);
             accelerationMatrix[i] = divideVector(resultantForce, mass);
         }
         return accelerationMatrix;
     }
 
     @Override
-    public double calculatePotentialEnergy(double[][] currentPositions) {
-        double potentialEnergy = 0;
+    public BigDecimal calculatePotentialEnergy(BigDecimal[][] currentPositions) {
+        BigDecimal potentialEnergy = BigDecimal.ZERO;
         for (int i = 0; i < currentPositions.length; i++) {
-            double[][] relativeMoleculeDistances = calculateMoleculeDistances(i, currentPositions);
-            potentialEnergy += calculateEnergyForMolecule(relativeMoleculeDistances);
+            BigDecimal[][] relativeMoleculeDistances = calculateMoleculeDistances(i, currentPositions);
+            potentialEnergy = potentialEnergy.add(calculateEnergyForMolecule(relativeMoleculeDistances));
         }
         return potentialEnergy;
     }
 
-    public double[] calculateEnergyInFunctionOfDistance(double[] distances) {
+    public BigDecimal[] calculateEnergyInFunctionOfDistance(BigDecimal[] distances) {
         return calculateEnergyForDistances(distances);
     }
 
@@ -46,63 +48,63 @@ public class LennardJonesModel implements MotionModel {
         return POTENTIAL_ENERGY_KEY;
     }
 
-    private double[][] calculateMoleculeDistances(int moleculeIndex, double[][] moleculesPositions) {
-        double[][] otherMoleculesPositions = removeVectorFromMatrix(moleculesPositions, moleculeIndex);
+    private BigDecimal[][] calculateMoleculeDistances(int moleculeIndex, BigDecimal[][] moleculesPositions) {
+        BigDecimal[][] otherMoleculesPositions = removeVectorFromMatrix(moleculesPositions, moleculeIndex);
         return subtractVectorFromMatrix(otherMoleculesPositions, moleculesPositions[moleculeIndex]);
     }
 
-    private double[] calculateResultantForceForMolecule(double[][] moleculeForceMatrix) {
+    private BigDecimal[] calculateResultantForceForMolecule(BigDecimal[][] moleculeForceMatrix) {
         return sumMatrixVectors(moleculeForceMatrix);
     }
 
-    private double[][] calculateForcesForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules) {
+    private BigDecimal[][] calculateForcesForMolecule(BigDecimal[][] moleculeDistanceMatrixFromOtherMolecules) {
         return multiplyMatrix(
                 subtractMatrices(
                         multiplyMatrix(
                                 divideScalarByMatrix(
-                                        1,
-                                        matrixPowerScalar(moleculeDistanceMatrixFromOtherMolecules, 13)
+                                        BigDecimal.ONE,
+                                        matrixPowerScalar(moleculeDistanceMatrixFromOtherMolecules, BigDecimal.valueOf(13))
                                 ),
-                                2 * Math.pow(sigma, 12)
+                                sigma.pow(12).multiply(BigDecimal.valueOf(2))
                         ),
                         multiplyMatrix(
                                 divideScalarByMatrix(
-                                        1,
-                                        matrixPowerScalar(moleculeDistanceMatrixFromOtherMolecules, 7)
+                                        BigDecimal.ONE,
+                                        matrixPowerScalar(moleculeDistanceMatrixFromOtherMolecules, BigDecimal.valueOf(7))
                                 ),
-                                Math.pow(sigma, 6)
+                                sigma.pow(6)
                         )
                 ),
-                (-24) * epsilon
+                epsilon.multiply(BigDecimal.valueOf(-24))
         );
     }
 
-    private double calculateEnergyForMolecule(double[][] moleculeDistanceMatrixFromOtherMolecules) {
-        double[] scalarDistanceVector = matrixVectorLengths(moleculeDistanceMatrixFromOtherMolecules);
+    private BigDecimal calculateEnergyForMolecule(BigDecimal[][] moleculeDistanceMatrixFromOtherMolecules) {
+        BigDecimal[] scalarDistanceVector = matrixVectorLengths(moleculeDistanceMatrixFromOtherMolecules);
         return sumVectorElements(
             calculateEnergyForDistances(scalarDistanceVector)
         );
     }
 
-    private double[] calculateEnergyForDistances(double[] scalarDistanceVector) {
+    private BigDecimal[] calculateEnergyForDistances(BigDecimal[] scalarDistanceVector) {
         return multiplyVector(
                 subtractVectors(
                         multiplyVector(
                                 divideScalarByVector(
-                                        1,
-                                        vectorPowerScalar(scalarDistanceVector, 12)
+                                        BigDecimal.ONE,
+                                        vectorPowerScalar(scalarDistanceVector, BigDecimal.valueOf(12))
                                 ),
-                                2 * Math.pow(sigma, 12)
+                                sigma.pow(12).multiply(BigDecimal.valueOf(2))
                         ),
                         multiplyVector(
                                 divideScalarByVector(
-                                        1,
-                                        vectorPowerScalar(scalarDistanceVector, 6)
+                                        BigDecimal.ONE,
+                                        vectorPowerScalar(scalarDistanceVector, BigDecimal.valueOf(6))
                                 ),
-                                Math.pow(sigma, 6)
+                                sigma.pow(6)
                         )
                 ),
-                4 * epsilon
+                epsilon.multiply(BigDecimal.valueOf(4))
         );
     }
 }

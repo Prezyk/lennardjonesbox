@@ -17,6 +17,8 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -99,11 +101,14 @@ public class AnimationController {
     private void prepareMoleculeAnimation(Simulation simulation, int moleculeIndex, CompletableFuture<Void> future, HashMap<Integer, Void> hashMap) {
         System.out.println("Starting preparation for " + moleculeIndex);
         for (int i = 0; i < simulation.getTimePoints(); i++) {
-            double xCoord = simulation.getPositionVectors()[moleculeIndex][i][0] * animationPane.getWidth() / simulation.getBoxSize();
-            double yCoord = animationPane.getHeight() - simulation.getPositionVectors()[moleculeIndex][i][1] * animationPane.getHeight() / simulation.getBoxSize();
+            BigDecimal xCoord = simulation.getPositionVectors()[moleculeIndex][i][0].multiply(BigDecimal.valueOf(animationPane.getWidth()))
+                                                                                    .divide(simulation.getBoxSize(), RoundingMode.HALF_UP);
+            BigDecimal yCoord = BigDecimal.valueOf(animationPane.getHeight())
+                                          .subtract(simulation.getPositionVectors()[moleculeIndex][i][1].multiply(BigDecimal.valueOf(animationPane.getHeight()))
+                                                                                                        .divide(simulation.getBoxSize(), RoundingMode.HALF_UP));
             pathList.get(moleculeIndex)
                     .getElements()
-                    .add(i == 0 ? new MoveTo(xCoord, yCoord) : new LineTo(xCoord, yCoord));
+                    .add(i == 0 ? new MoveTo(xCoord.doubleValue(), yCoord.doubleValue()) : new LineTo(xCoord.doubleValue(), yCoord.doubleValue()));
             if (i % 2000 == 0) {
                 System.out.println("Progress molecule " + moleculeIndex + " : " + i + " out of " + simulation.getTimePoints());
             }
@@ -134,9 +139,9 @@ public class AnimationController {
         return future;
     }
 
-    private PathTransition createPathTransition(Circle node, Path path, double time) {
+    private PathTransition createPathTransition(Circle node, Path path, BigDecimal time) {
         PathTransition pathTransition = new PathTransition();
-        pathTransition.setDuration(Duration.seconds(time));
+        pathTransition.setDuration(Duration.seconds(time.doubleValue()));
         pathTransition.setPath(path);
         pathTransition.setNode(node);
         return pathTransition;
@@ -157,9 +162,11 @@ public class AnimationController {
 
         SimulationInput simulationConditions = event.getSimulationConditions();
 
-        double rScaled = simulationConditions.getMoleculeRadius() / simulationConditions.getBoxSize() * animationPane.getWidth();
+        BigDecimal rScaled = simulationConditions.getMoleculeRadius()
+                                                 .divide(simulationConditions.getBoxSize(), RoundingMode.HALF_UP)
+                                                 .multiply(BigDecimal.valueOf(animationPane.getWidth()));
         for (int i = 0; i < simulationConditions.getMoleculesQuantity(); i++) {
-            atoms.add(new Circle(rScaled));
+            atoms.add(new Circle(rScaled.doubleValue()));
             pathList.add(new Path());
         }
 

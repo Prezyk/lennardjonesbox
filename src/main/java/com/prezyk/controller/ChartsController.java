@@ -12,8 +12,8 @@ import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.Pane;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChartsController {
 
@@ -45,7 +45,7 @@ public class ChartsController {
         List<String> currentChartNames = chart.getData()
                                               .stream()
                                               .map(XYChart.Series::getName)
-                                              .collect(Collectors.toList());
+                                              .toList();
         chart.setLegendVisible(true);
 
         if (chartMapper.getNames()
@@ -73,23 +73,10 @@ public class ChartsController {
              .forEach(series -> loadChart(series, chartMapper.getTimeSeries(series.getName()), chartMapper.getTimePoints()));
     }
 
-    private void loadChart(XYChart.Series<Number, Number> series, Double[] timeSeries, double[] timePoints) {
+    private void loadChart(XYChart.Series<Number, Number> series, BigDecimal[] timeSeries, BigDecimal[] timePoints) {
         series.getData()
               .clear();
         System.out.println("Loading chart: " + series.getName());
-        if (timeSeries.length != timePoints.length)
-            throw new IllegalArgumentException("Time series should have the same amount of points as time points.");
-
-        for (int i = 0; i < timePoints.length; i++) {
-            series.getData()
-                  .add(new XYChart.Data<>(timePoints[i], timeSeries[i]));
-        }
-    }
-
-    private void loadChart(XYChart.Series<Number, Number> series, double[] timeSeries, double[] timePoints) {
-        series.getData()
-              .clear();
-
         if (timeSeries.length != timePoints.length)
             throw new IllegalArgumentException("Time series should have the same amount of points as time points.");
 
@@ -106,14 +93,14 @@ public class ChartsController {
 
     private void simulationFunctionRunEventHandler(SimulationFunctionRunEvent event) {
         LennardJonesModel lj = new LennardJonesModel(event.getSimulationInput().getEpsilon(), event.getSimulationInput().getMass(), event.getSimulationInput().getSigma());
-        double[] functionValues = lj.calculateEnergyInFunctionOfDistance(event.getDistances());
+        BigDecimal[] functionValues = lj.calculateEnergyInFunctionOfDistance(event.getDistances());
         chart.getData()
              .clear();
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName("Function");
         chart.getData()
              .add(series);
-        for (double t: event.getDistances()) {
+        for (BigDecimal t: event.getDistances()) {
             System.out.println(t);
         }
         loadChart(series, functionValues, event.getDistances());
