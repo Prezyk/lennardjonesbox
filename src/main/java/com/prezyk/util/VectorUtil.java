@@ -186,13 +186,13 @@ public class VectorUtil {
         return resultScalar;
     }
 
-    private static void validateMatricesSizeSameOrThrow(BigDecimal[][] leftMatrix, BigDecimal[][] rightMatrix) {
+    public static void validateMatricesSizeSameOrThrow(BigDecimal[][] leftMatrix, BigDecimal[][] rightMatrix) {
         if (leftMatrix.length != rightMatrix.length) {
             throw VectorSizeException.matrixSizeMismatch(leftMatrix.length, rightMatrix.length);
         }
     }
 
-    private static void validateMatrix(BigDecimal[][] matrix) {
+    public static void validateMatrix(BigDecimal[][] matrix) {
         validateMatrixLengthNonZeroOrThrow(matrix);
         int firstVectorSize = matrix[0].length;
         for (BigDecimal[] vector : matrix) {
@@ -201,25 +201,25 @@ public class VectorUtil {
         }
     }
 
-    private static void validateMatrixLengthNonZeroOrThrow(BigDecimal[][] matrix) {
+    public static void validateMatrixLengthNonZeroOrThrow(BigDecimal[][] matrix) {
         if (matrix.length == 0) {
             throw VectorSizeException.matrixSizeZero();
         }
     }
 
-    private static void validateVectorSizeNonZeroOrThrow(BigDecimal[] vector) {
+    public static void validateVectorSizeNonZeroOrThrow(BigDecimal[] vector) {
         if (vector.length == 0) {
             throw VectorSizeException.vectorSizeZero();
         }
     }
 
-    private static void validateVectorOfSizeOrThrow(BigDecimal[] vector, int size) {
+    public static void validateVectorOfSizeOrThrow(BigDecimal[] vector, int size) {
         if (vector.length != size) {
             throw VectorSizeException.vectorSizeInvalid(vector.length, size);
         }
     }
 
-    private static void validateVectorSizeSameOrThrow(BigDecimal[] leftVector, BigDecimal[] rightVector) {
+    public static void validateVectorSizeSameOrThrow(BigDecimal[] leftVector, BigDecimal[] rightVector) {
         if (leftVector.length != rightVector.length) {
             throw VectorSizeException.vectorsSizeMismatch(leftVector.length, rightVector.length);
         }
